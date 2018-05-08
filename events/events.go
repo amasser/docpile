@@ -11,6 +11,7 @@ type TagAdded struct {
 	Timestamp time.Time `json:"timestamp"`
 	TagName   string    `json:"tag_name"`
 }
+
 type ManagedAssetImported struct {
 	AssetID   uint64     `json:"asset_id"`
 	Timestamp time.Time  `json:"timestamp"`
@@ -18,6 +19,8 @@ type ManagedAssetImported struct {
 	MIMEType  string     `json:"mime_type"`
 	Name      string     `json:"name"`
 }
+
+// NOTE: this could simply be for resources which are unmanaged
 type CloudAssetImported struct {
 	AssetID   uint64    `json:"asset_id"`
 	Timestamp time.Time `json:"timestamp"`
@@ -25,6 +28,7 @@ type CloudAssetImported struct {
 	Provider  string    `json:"provider"`
 	Resource  string    `json:"resource"`
 }
+
 type DocumentDefined struct {
 	DocumentID  uint64     `json:"document_id"`
 	Timestamp   time.Time  `json:"timestamp"`
