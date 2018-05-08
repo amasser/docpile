@@ -7,26 +7,15 @@ import (
 )
 
 type DocumentController struct {
-	app domain.DocumentDefiner
+	handler domain.Handler
 }
 
-func NewDocumentController(app domain.DocumentDefiner) *DocumentController {
-	return &DocumentController{app: app}
+func NewDocumentController(handler domain.Handler) *DocumentController {
+	return &DocumentController{handler: handler}
 }
 
 func (this *DocumentController) Add(input *inputs.DefineDocument) detour.Renderer {
-	proposed := domain.DocumentDefinition{
-		AssetID:     input.AssetID,
-		AssetOffset: input.AssetOffset,
-		Published:   input.Published,
-		PeriodBegin: input.PeriodBegin,
-		PeriodEnd:   input.PeriodEnd,
-		Tags:        input.Tags,
-		Documents:   input.Documents,
-		Description: input.Description,
-	}
-
-	if documentID, err := this.app.DefineDocument(proposed); err == nil {
+	if documentID, err := this.add(input); err == nil {
 		return newEntityResult(documentID)
 	} else if err == domain.AssetNotFoundError {
 		return inputs.AssetDoesNotExistResult
@@ -37,4 +26,19 @@ func (this *DocumentController) Add(input *inputs.DefineDocument) detour.Rendere
 	} else {
 		return UnknownErrorResult
 	}
+}
+func (this *DocumentController) add(input *inputs.DefineDocument) (uint64, error) {
+	return this.handler.Handle(domain.DefineDocument{
+		Document: domain.DocumentDefinition{
+			AssetID:     input.AssetID,
+			AssetOffset: input.AssetOffset,
+			Published:   input.Published,
+			PeriodBegin: input.PeriodBegin,
+			PeriodEnd:   input.PeriodEnd,
+			Tags:        input.Tags,
+			Documents:   input.Documents,
+			Description: input.Description,
+		},
+	})
+
 }

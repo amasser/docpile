@@ -2,7 +2,6 @@ package domain
 
 import (
 	"errors"
-	"io"
 	"time"
 )
 
@@ -19,18 +18,6 @@ var (
 	StoreAssetError         = errors.New("unable to storage asset")
 )
 
-// TODO: these are deprecated in favor of a generic handler
-type (
-	TagAdder interface {
-		AddTag(string) (uint64, error)
-	}
-	DocumentDefiner interface {
-		DefineDocument(DocumentDefinition) (uint64, error)
-	}
-	ManagedAssetStreamImporter interface {
-		ImportManagedAsset(string, string, io.ReadCloser) (uint64, error)
-	}
-)
 type DocumentDefinition struct {
 	AssetID     uint64
 	AssetOffset uint64
