@@ -1,8 +1,8 @@
 package events
 
 import (
-	"time"
 	"net/url"
+	"time"
 )
 
 type TagAdded struct {
