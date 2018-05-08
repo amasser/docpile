@@ -106,7 +106,7 @@ func (this *Aggregate) validDefinition(doc DocumentDefinition) error {
 
 	for _, documentID := range doc.Documents {
 		if _, contains := this.documentsByID[documentID]; !contains {
-			return LinkedDocumentNotFoundError
+			return DocumentNotFoundError
 		}
 	}
 

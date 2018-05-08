@@ -1,13 +1,13 @@
 package inputs
 
 const (
-	nameField  = "name"
-	beginField = "begin"
-	endField   = "end"
+	nameField = "name"
 )
 
 const (
-	jsonTagsField      = "tags"
-	jsonAssetIDField   = "asset_id"
-	jsonDocumentsField = "documents"
+	jsonTagsField        = "tags"
+	jsonAssetIDField     = "asset_id"
+	jsonPeriodBeginField = "period_begin"
+	jsonPeriodEndField   = "period_end"
+	jsonDocumentsField   = "documents"
 )

@@ -10,11 +10,11 @@ type IdentityGenerator interface {
 }
 
 var (
-	TagAlreadyExistsError       = errors.New("tag already exists")
-	AssetAlreadyExistsError     = errors.New("asset already exists")
-	AssetNotFoundError          = errors.New("asset not found")
-	TagNotFoundError            = errors.New("tag not found")
-	LinkedDocumentNotFoundError = errors.New("linked document not found")
+	TagAlreadyExistsError   = errors.New("tag already exists")
+	AssetAlreadyExistsError = errors.New("asset already exists")
+	AssetNotFoundError      = errors.New("asset not found")
+	TagNotFoundError        = errors.New("tag not found")
+	DocumentNotFoundError   = errors.New("document not found")
 )
 
 type DocumentDefinition struct {
@@ -30,4 +30,8 @@ type DocumentDefinition struct {
 
 type TagAdder interface {
 	AddTag(string) (uint64, error)
+}
+
+type DocumentDefiner interface {
+	DefineDocument(DocumentDefinition) (uint64, error)
 }
