@@ -26,7 +26,7 @@ type (
 	DocumentDefiner interface {
 		DefineDocument(DocumentDefinition) (uint64, error)
 	}
-	ManagedAssetImporter interface {
+	ManagedAssetStreamImporter interface {
 		ImportManagedAsset(string, string, io.ReadCloser) (uint64, error)
 	}
 )

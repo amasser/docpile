@@ -7,10 +7,10 @@ import (
 )
 
 type AssetController struct {
-	app domain.ManagedAssetImporter
+	app domain.ManagedAssetStreamImporter
 }
 
-func NewAssetController(app domain.ManagedAssetImporter) *AssetController {
+func NewAssetController(app domain.ManagedAssetStreamImporter) *AssetController {
 	return &AssetController{app: app}
 }
 
