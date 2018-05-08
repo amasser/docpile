@@ -16,6 +16,7 @@ type Aggregate struct {
 	identity      IdentityGenerator
 	tags          map[string]struct{}
 	managedHashes map[events.SHA256Hash]struct{}
+	cloudAssets   map[string]struct{}
 }
 
 func NewAggregate(identity IdentityGenerator) *Aggregate {
@@ -23,6 +24,7 @@ func NewAggregate(identity IdentityGenerator) *Aggregate {
 		identity:      identity,
 		tags:          make(map[string]struct{}),
 		managedHashes: make(map[events.SHA256Hash]struct{}),
+		cloudAssets:   make(map[string]struct{}),
 	}
 }
 
@@ -50,10 +52,25 @@ func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256H
 		Name:      name,
 	})
 }
-func (this *Aggregate) ImportCloudAsset() {
+func (this *Aggregate) ImportCloudAsset(name, provider, resource string) {
+	if _, contains := this.cloudAssets[composeCloudKey(provider, resource)]; contains {
+		return
+	}
+
+	this.raise(events.CloudAssetImported{
+		AssetID:   this.identity.Next(),
+		Timestamp: this.clock.UTCNow(),
+		Name:      name,
+		Provider:  provider,
+		Resource:  resource,
+	})
 }
 func (this *Aggregate) DefineDocument() {
 }
+func composeCloudKey(provider, resource string) string {
+	return fmt.Sprintf("%s.%s", strings.ToLower(provider), resource)
+}
+
 func (this *Aggregate) raise(event interface{}) {
 	this.Apply(event)
 	this.events = append(this.events, event)
@@ -80,6 +97,7 @@ func (this *Aggregate) applyManagedAssetImported(event events.ManagedAssetImport
 	this.managedHashes[event.Hash] = struct{}{}
 }
 func (this *Aggregate) applyCloudAssetImported(event events.CloudAssetImported) {
+	this.cloudAssets[composeCloudKey(event.Provider, event.Resource)] = struct{}{}
 }
 func (this *Aggregate) applyDocumentDefined(event events.DocumentDefined) {
 }
