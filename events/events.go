@@ -33,10 +33,11 @@ type DocumentDefined struct {
 	DocumentID  uint64     `json:"document_id"`
 	Timestamp   time.Time  `json:"timestamp"`
 	AssetID     uint64     `json:"asset_id"`
+	AssetOffset uint64     `json:"asset_offset,omitempty"`
 	Published   *time.Time `json:"published,omitempty"`
 	PeriodBegin *time.Time `json:"begin,omitempty"`
 	PeriodEnd   *time.Time `json:"end,omitempty"`
 	Tags        []uint64   `json:"tags,omitempty"`
-	Associated  []uint64   `json:"Associated,omitempty"`
+	Documents   []uint64   `json:"documents,omitempty"`
 	Description string     `json:"description,omitempty"`
 }
