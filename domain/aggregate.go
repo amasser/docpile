@@ -17,14 +17,10 @@ type Aggregate struct {
 	tagsByID      map[uint64]struct{}
 	tagsByName    map[string]struct{}
 	assetsByID    map[uint64]struct{}
-	managedAssets map[managedAssetKey]struct{}
-	cloudAssets   map[cloudAssetKey]struct{}
+	managedAssets map[managedKey]struct{}
+	cloudAssets   map[cloudKey]struct{}
 	documentsByID map[uint64]struct{}
 }
-type (
-	cloudAssetKey   string
-	managedAssetKey events.SHA256Hash
-)
 
 func NewAggregate(identity IdentityGenerator) *Aggregate {
 	return &Aggregate{
@@ -32,8 +28,8 @@ func NewAggregate(identity IdentityGenerator) *Aggregate {
 		tagsByID:      make(map[uint64]struct{}),
 		tagsByName:    make(map[string]struct{}),
 		assetsByID:    make(map[uint64]struct{}),
-		managedAssets: make(map[managedAssetKey]struct{}),
-		cloudAssets:   make(map[cloudAssetKey]struct{}),
+		managedAssets: make(map[managedKey]struct{}),
+		cloudAssets:   make(map[cloudKey]struct{}),
 		documentsByID: make(map[uint64]struct{}),
 	}
 }
@@ -49,7 +45,7 @@ func (this *Aggregate) AddTag(name string) error {
 		TagName:   name,
 	})
 }
-func (this *Aggregate) ImportManagedAsset(name, mime string, hash managedAssetKey) error {
+func (this *Aggregate) ImportManagedAsset(name, mime string, hash managedKey) error {
 	if _, contains := this.managedAssets[hash]; contains {
 		return AssetAlreadyExistsError
 	}
@@ -142,21 +138,18 @@ func (this *Aggregate) applyTagAdded(event events.TagAdded) {
 }
 func (this *Aggregate) applyManagedAssetImported(event events.ManagedAssetImported) {
 	this.assetsByID[event.AssetID] = struct{}{}
-	this.managedAssets[managedAssetKey(event.Hash)] = struct{}{}
+	this.managedAssets[managedKey(event.Hash)] = struct{}{}
 }
 func (this *Aggregate) applyCloudAssetImported(event events.CloudAssetImported) {
 	this.assetsByID[event.AssetID] = struct{}{}
 	this.cloudAssets[newCloudAssetKey(event.Provider, event.Resource)] = struct{}{}
 }
 func (this *Aggregate) applyDocumentDefined(event events.DocumentDefined) {
+	this.documentsByID[event.DocumentID] = struct{}{}
 }
 
 func (this *Aggregate) Consume() []interface{} {
 	consumed := this.events
 	this.events = nil // don't re-use the buffer
 	return consumed
-}
-
-func newCloudAssetKey(provider, resource string) cloudAssetKey {
-	return cloudAssetKey(fmt.Sprintf("%s.%s", strings.ToLower(provider), resource))
 }
