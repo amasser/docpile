@@ -14,4 +14,13 @@ type Writer interface {
 	Write(string, io.ReadCloser) error
 }
 
+type Mover interface {
+	Move(string, string) error
+}
+
+type WriteMover interface {
+	Writer
+	Mover
+}
+
 var NotFoundError = os.ErrNotExist

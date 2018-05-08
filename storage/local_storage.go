@@ -50,6 +50,18 @@ func (this *LocalStorage) write(source io.ReadCloser, destination io.WriteCloser
 	return err
 }
 
+func (this *LocalStorage) Move(old, new string) error {
+	old = this.composeFilename(old)
+	new = this.composeFilename(new)
+	if err := os.Rename(old, new); os.IsNotExist(err) {
+		return NotFoundError
+	} else if err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
+
 func (this *LocalStorage) composeFilename(key string) string {
 	key = strings.TrimSpace(key)
 	if len(key) == 0 {

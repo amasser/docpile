@@ -5,12 +5,12 @@ import (
 )
 
 type LocalStorageHandler struct {
-	inner   domain.Handler
-	storage Writer
+	inner  domain.Handler
+	writer Writer
 }
 
-func NewLocalStorageHandler(inner domain.Handler, storage Writer) *LocalStorageHandler {
-	return &LocalStorageHandler{inner: inner, storage: storage}
+func NewLocalStorageHandler(inner domain.Handler, writer Writer) *LocalStorageHandler {
+	return &LocalStorageHandler{inner: inner, writer: writer}
 }
 
 func (this *LocalStorageHandler) Handle(message interface{}) (uint64, error) {
