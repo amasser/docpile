@@ -34,50 +34,54 @@ func NewAggregate(identity IdentityGenerator) *Aggregate {
 	}
 }
 
-func (this *Aggregate) AddTag(name string) error {
+func (this *Aggregate) AddTag(name string) (uint64, error) {
 	if _, contains := this.tagsByName[strings.ToLower(name)]; contains {
-		return TagAlreadyExistsError
+		return 0, TagAlreadyExistsError
 	}
 
-	return this.raise(events.TagAdded{
-		TagID:     this.identity.Next(),
+	id := this.identity.Next()
+	return id, this.raise(events.TagAdded{
+		TagID:     id,
 		Timestamp: this.clock.UTCNow(),
 		TagName:   name,
 	})
 }
-func (this *Aggregate) ImportManagedAsset(name, mime string, hash managedKey) error {
+func (this *Aggregate) ImportManagedAsset(name, mime string, hash managedKey) (uint64, error) {
 	if _, contains := this.managedAssets[hash]; contains {
-		return AssetAlreadyExistsError
+		return 0, AssetAlreadyExistsError
 	}
 
-	return this.raise(events.ManagedAssetImported{
-		AssetID:   this.identity.Next(),
+	id := this.identity.Next()
+	return id, this.raise(events.ManagedAssetImported{
+		AssetID:   id,
 		Timestamp: this.clock.UTCNow(),
 		Hash:      events.SHA256Hash(hash),
 		MIMEType:  mime,
 		Name:      name,
 	})
 }
-func (this *Aggregate) ImportCloudAsset(name, provider, resource string) error {
+func (this *Aggregate) ImportCloudAsset(name, provider, resource string) (uint64, error) {
 	if _, contains := this.cloudAssets[newCloudAssetKey(provider, resource)]; contains {
-		return AssetAlreadyExistsError
+		return 0, AssetAlreadyExistsError
 	}
 
-	return this.raise(events.CloudAssetImported{
-		AssetID:   this.identity.Next(),
+	id := this.identity.Next()
+	return id, this.raise(events.CloudAssetImported{
+		AssetID:   id,
 		Timestamp: this.clock.UTCNow(),
 		Name:      name,
 		Provider:  provider,
 		Resource:  resource,
 	})
 }
-func (this *Aggregate) DefineDocument(doc DocumentDefinition) error {
+func (this *Aggregate) DefineDocument(doc DocumentDefinition) (uint64, error) {
 	if err := this.validDefinition(doc); err != nil {
-		return err
+		return 0, err
 	}
 
-	this.raise(events.DocumentDefined{
-		DocumentID:  this.identity.Next(),
+	id := this.identity.Next()
+	return id, this.raise(events.DocumentDefined{
+		DocumentID:  id,
 		Timestamp:   this.clock.UTCNow(),
 		AssetID:     doc.AssetID,
 		AssetOffset: doc.AssetOffset,
@@ -88,8 +92,6 @@ func (this *Aggregate) DefineDocument(doc DocumentDefinition) error {
 		Documents:   doc.Documents,
 		Description: doc.Description,
 	})
-
-	return nil
 }
 func (this *Aggregate) validDefinition(doc DocumentDefinition) error {
 	if _, contains := this.assetsByID[doc.AssetID]; !contains {

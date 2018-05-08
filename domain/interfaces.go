@@ -27,3 +27,7 @@ type DocumentDefinition struct {
 	Documents   []uint64
 	Description string
 }
+
+type TagAdder interface {
+	AddTag(string) (uint64, error)
+}
