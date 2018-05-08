@@ -46,8 +46,8 @@ func (this *Aggregate) AddTag(name string) (uint64, error) {
 		TagName:   name,
 	})
 }
-func (this *Aggregate) ImportManagedAsset(name, mime string, hash managedKey) (uint64, error) {
-	if _, contains := this.managedAssets[hash]; contains {
+func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256Hash) (uint64, error) {
+	if _, contains := this.managedAssets[managedKey(hash)]; contains {
 		return 0, AssetAlreadyExistsError
 	}
 
