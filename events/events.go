@@ -20,7 +20,7 @@ type ManagedAssetImported struct {
 	Name      string     `json:"name"`
 }
 
-// NOTE: this could simply be for resources which are unmanaged
+// NOTE: this could simply be for resources which are unmanaged rather than cloud
 type CloudAssetImported struct {
 	AssetID   uint64    `json:"asset_id"`
 	Timestamp time.Time `json:"timestamp"`
