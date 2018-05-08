@@ -2,6 +2,7 @@ package inputs
 
 const (
 	nameField = "name"
+	fileField = "file"
 )
 
 const (
