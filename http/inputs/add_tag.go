@@ -27,9 +27,6 @@ func (this *AddTag) Validate() error {
 }
 
 var (
-	missingTagError    = detour.SimpleInputError("A tag name is required.", nameField)
-	DuplicateTagResult = detour.ErrorResult{
-		StatusCode: http.StatusConflict,
-		Error1:     detour.SimpleInputError("The tag provided already exists.", nameField),
-	}
+	missingTagError    = fieldError("A tag name is required.", nameField)
+	DuplicateTagResult = conflictResult("The tag provided already exists.", nameField)
 )
