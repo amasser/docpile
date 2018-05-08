@@ -1,11 +1,19 @@
 package domain
 
-import "bitbucket.org/jonathanoliver/docpile/events"
+import (
+	"bitbucket.org/jonathanoliver/docpile/events"
+	"io"
+)
 
 type AddTag struct {
 	Name string
 }
 
+type ImportManagedStreamingAsset struct {
+	Name     string
+	MIMEType string
+	Body     io.ReadCloser
+}
 type ImportManagedAsset struct {
 	Name     string
 	MIMEType string
