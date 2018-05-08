@@ -115,39 +115,44 @@ func (this *Aggregate) validDefinition(doc DocumentDefinition) error {
 }
 
 func (this *Aggregate) raise(event interface{}) error {
-	this.Apply(event)
+	this.apply(event)
 	this.events = append(this.events, event)
 	return nil
 }
 
-func (this *Aggregate) Apply(event interface{}) {
-	switch event := event.(type) {
-	case events.TagAdded:
-		this.applyTagAdded(event)
-	case events.ManagedAssetImported:
-		this.applyManagedAssetImported(event)
-	case events.CloudAssetImported:
-		this.applyCloudAssetImported(event)
-	case events.DocumentDefined:
-		this.applyDocumentDefined(event)
-	default:
-		log.Panicf(fmt.Sprintf("Aggregate cannot apply '%s'", reflect.TypeOf(event)))
+func (this *Aggregate) Apply(messages ...interface{}) {
+	for _, message := range messages {
+		this.apply(message)
 	}
 }
-func (this *Aggregate) applyTagAdded(event events.TagAdded) {
-	this.tagsByID[event.TagID] = struct{}{}
-	this.tagsByName[strings.ToLower(event.TagName)] = struct{}{}
+func (this *Aggregate) apply(message interface{}) {
+	switch message := message.(type) {
+	case events.TagAdded:
+		this.applyTagAdded(message)
+	case events.ManagedAssetImported:
+		this.applyManagedAssetImported(message)
+	case events.CloudAssetImported:
+		this.applyCloudAssetImported(message)
+	case events.DocumentDefined:
+		this.applyDocumentDefined(message)
+	default:
+		log.Panicf(fmt.Sprintf("Aggregate cannot apply '%s'", reflect.TypeOf(message)))
+	}
 }
-func (this *Aggregate) applyManagedAssetImported(event events.ManagedAssetImported) {
-	this.assetsByID[event.AssetID] = struct{}{}
-	this.managedAssets[managedKey(event.Hash)] = struct{}{}
+func (this *Aggregate) applyTagAdded(message events.TagAdded) {
+	this.tagsByID[message.TagID] = struct{}{}
+	this.tagsByName[strings.ToLower(message.TagName)] = struct{}{}
 }
-func (this *Aggregate) applyCloudAssetImported(event events.CloudAssetImported) {
-	this.assetsByID[event.AssetID] = struct{}{}
-	this.cloudAssets[newCloudAssetKey(event.Provider, event.Resource)] = struct{}{}
+func (this *Aggregate) applyManagedAssetImported(message events.ManagedAssetImported) {
+	this.assetsByID[message.AssetID] = struct{}{}
+	this.managedAssets[managedKey(message.Hash)] = struct{}{}
 }
-func (this *Aggregate) applyDocumentDefined(event events.DocumentDefined) {
-	this.documentsByID[event.DocumentID] = struct{}{}
+func (this *Aggregate) applyCloudAssetImported(message events.CloudAssetImported) {
+	this.assetsByID[message.AssetID] = struct{}{}
+	this.cloudAssets[newCloudAssetKey(message.Provider, message.Resource)] = struct{}{}
+}
+func (this *Aggregate) applyDocumentDefined(message events.DocumentDefined) {
+	this.documentsByID[message.DocumentID] = struct{}{}
 }
 
 func (this *Aggregate) Consume() []interface{} {

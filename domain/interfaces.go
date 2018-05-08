@@ -19,6 +19,7 @@ var (
 	StoreAssetError         = errors.New("unable to storage asset")
 )
 
+// TODO: these are deprecated in favor of a generic handler
 type (
 	TagAdder interface {
 		AddTag(string) (uint64, error)
@@ -40,3 +41,12 @@ type DocumentDefinition struct {
 	Documents   []uint64
 	Description string
 }
+
+type (
+	MessageHandler interface {
+		Handle(interface{}) (uint64, error)
+	}
+	MessageApplicator interface {
+		Apply(...interface{})
+	}
+)
