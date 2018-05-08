@@ -9,41 +9,41 @@ import (
 	"github.com/smartystreets/detour"
 )
 
-type AddFile struct {
-	Filename      string
+type ImportManagedAsset struct {
+	Name          string
 	Reader        io.ReadCloser
 	MIMEType      string
 	contentLength uint64
 }
 
-func (this *AddFile) Bind(request *http.Request) error {
-	reader, file, err := request.FormFile(fileField)
+func (this *ImportManagedAsset) Bind(request *http.Request) error {
+	reader, header, err := request.FormFile(fileField)
 	if err != nil {
 		return badAssetError
 	}
 
-	this.Filename = file.Filename
-	this.MIMEType = this.computeMIMEType()
+	this.Name = header.Filename
 	this.Reader = reader
-	this.contentLength = uint64(request.ContentLength)
+	this.MIMEType = this.computeMIMEType()
+	this.contentLength = uint64(header.Size)
 
 	return nil
 }
 
-func (this *AddFile) Sanitize() {
-	this.Filename = strings.TrimSpace(this.Filename)
+func (this *ImportManagedAsset) Sanitize() {
+	this.Name = strings.TrimSpace(this.Name)
 }
 
-func (this *AddFile) Validate() error {
+func (this *ImportManagedAsset) Validate() error {
 	var errors detour.Errors
-	errors = errors.AppendIf(filenameError, len(this.Filename) == 0)
+	errors = errors.AppendIf(filenameError, len(this.Name) == 0)
 	errors = errors.AppendIf(emptyAssetError, this.contentLength == 0)
 	errors = errors.AppendIf(unsupportedTypeError, len(this.MIMEType) == 0)
 	return errors
 }
 
-func (this *AddFile) computeMIMEType() string {
-	switch path.Ext(strings.ToLower(this.Filename)) {
+func (this *ImportManagedAsset) computeMIMEType() string {
+	switch path.Ext(strings.ToLower(this.Name)) {
 	case ".pdf":
 		return "application/pdf"
 	case ".doc":

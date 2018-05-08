@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"io"
 	"time"
 )
 
@@ -15,8 +16,20 @@ var (
 	AssetNotFoundError      = errors.New("asset not found")
 	TagNotFoundError        = errors.New("tag not found")
 	DocumentNotFoundError   = errors.New("document not found")
+	StoreAssetError         = errors.New("unable to storage asset")
 )
 
+type (
+	TagAdder interface {
+		AddTag(string) (uint64, error)
+	}
+	DocumentDefiner interface {
+		DefineDocument(DocumentDefinition) (uint64, error)
+	}
+	ManagedAssetImporter interface {
+		ImportManagedAsset(string, string, io.ReadCloser) (uint64, error)
+	}
+)
 type DocumentDefinition struct {
 	AssetID     uint64
 	AssetOffset uint64
@@ -26,12 +39,4 @@ type DocumentDefinition struct {
 	Tags        []uint64
 	Documents   []uint64
 	Description string
-}
-
-type TagAdder interface {
-	AddTag(string) (uint64, error)
-}
-
-type DocumentDefiner interface {
-	DefineDocument(DocumentDefinition) (uint64, error)
 }
