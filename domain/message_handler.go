@@ -6,16 +6,16 @@ import (
 	"log"
 )
 
-type Handler struct {
+type MessageHandler struct {
 	root       *Aggregate
-	applicator MessageApplicator
+	applicator Applicator
 }
 
-func NewHandler(app *Aggregate) *Handler {
-	return &Handler{root: app}
+func NewMessageHandler(app *Aggregate) *MessageHandler {
+	return &MessageHandler{root: app}
 }
 
-func (this *Handler) Handle(message interface{}) (uint64, error) {
+func (this *MessageHandler) Handle(message interface{}) (uint64, error) {
 	if id, err := this.handle(message); err != nil {
 		return 0, err
 	} else {
@@ -23,7 +23,7 @@ func (this *Handler) Handle(message interface{}) (uint64, error) {
 		return id, nil
 	}
 }
-func (this *Handler) handle(message interface{}) (uint64, error) {
+func (this *MessageHandler) handle(message interface{}) (uint64, error) {
 	switch message := message.(type) {
 	case AddTag:
 		return this.root.AddTag(message.Name)
@@ -34,7 +34,7 @@ func (this *Handler) handle(message interface{}) (uint64, error) {
 	case DefineDocument:
 		return this.root.DefineDocument(message.Document)
 	default:
-		log.Panicf(fmt.Sprintf("Handler cannot handle '%s'", reflect.TypeOf(message)))
+		log.Panicf(fmt.Sprintf("MessageHandler cannot handle '%s'", reflect.TypeOf(message)))
 	}
 
 	return 0, nil

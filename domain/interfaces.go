@@ -43,10 +43,10 @@ type DocumentDefinition struct {
 }
 
 type (
-	MessageHandler interface {
+	Handler interface {
 		Handle(interface{}) (uint64, error)
 	}
-	MessageApplicator interface {
+	Applicator interface {
 		Apply(...interface{})
 	}
 )
