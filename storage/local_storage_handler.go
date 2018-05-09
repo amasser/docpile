@@ -3,12 +3,12 @@ package storage
 import (
 	"bytes"
 	"crypto/sha256"
-	"io"
 	"io/ioutil"
 	"strconv"
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/events"
+	"io"
 )
 
 type LocalStorageHandler struct {
@@ -29,7 +29,6 @@ func (this *LocalStorageHandler) Handle(message interface{}) (uint64, error) {
 		return this.inner.Handle(message)
 	}
 }
-
 func (this *LocalStorageHandler) handleImportManagedStreamingAsset(message domain.ImportManagedStreamingAsset) (uint64, error) {
 	buffer, err := bufferStream(message.Body)
 	if err != nil {
@@ -48,6 +47,19 @@ func (this *LocalStorageHandler) handleImportManagedStreamingAsset(message domai
 	return id, nil
 }
 
+func (this *LocalStorageHandler) sendMessage(name, mime string, buffer *bytes.Buffer) (uint64, error) {
+	return this.Handle(domain.ImportManagedAsset{
+		Name:     name,
+		MIMEType: mime,
+		Hash:     computeHash(buffer),
+	})
+}
+func (this *LocalStorageHandler) writeBuffer(id uint64, buffer *bytes.Buffer) error {
+	filename := strconv.FormatUint(id, 10)
+	source := ioutil.NopCloser(buffer)
+	return this.writer.Write(filename, source)
+}
+
 func bufferStream(reader io.ReadCloser) (*bytes.Buffer, error) {
 	defer reader.Close()
 	buffer := bytes.NewBuffer([]byte{})
@@ -57,20 +69,6 @@ func bufferStream(reader io.ReadCloser) (*bytes.Buffer, error) {
 		return nil, err
 	}
 }
-
-func (this *LocalStorageHandler) sendMessage(name, mime string, buffer *bytes.Buffer) (uint64, error) {
-	return this.Handle(domain.ImportManagedAsset{
-		Name:     name,
-		MIMEType: mime,
-		Hash:     computeHash(buffer),
-	})
-}
-
 func computeHash(buffer *bytes.Buffer) events.SHA256Hash {
 	return events.SHA256Hash(sha256.Sum256(buffer.Bytes()))
-}
-func (this *LocalStorageHandler) writeBuffer(id uint64, buffer *bytes.Buffer) error {
-	filename := strconv.FormatUint(id, 10)
-	source := ioutil.NopCloser(buffer)
-	return this.writer.Write(filename, source)
 }
