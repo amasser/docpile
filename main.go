@@ -33,6 +33,13 @@ func main() {
 	router.Handler("PUT", "/assets", detour.New(assetController.ImportManaged))
 	router.Handler("PUT", "/documents", detour.New(documentController.Define))
 
+	// apply/remove one or more tags to a single document
+	//   PUT /documents/:id/tags
+	//   DELETE /document/:id/tags/:tags
+	// apply/remove one tag to one or more documents
+	//   PUT /tags/:id/documents
+	//   DELETE /tags/:id/documents/:documents
+
 	fmt.Println("Listening...")
 	stdhttp.ListenAndServe("127.0.0.1:8080", router)
 }
