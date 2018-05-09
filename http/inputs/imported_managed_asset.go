@@ -72,7 +72,7 @@ func normalizeFilename(value string) string {
 	case "/":
 		return ""
 	default:
-		return base + strings.ToLower(path.Ext(base))
+		return strings.TrimSuffix(base, path.Ext(base)) + strings.ToLower(path.Ext(base))
 	}
 }
 
