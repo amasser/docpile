@@ -5,13 +5,30 @@ import (
 	"log"
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
-	"bitbucket.org/jonathanoliver/docpile/http"
 	"bitbucket.org/jonathanoliver/docpile/storage"
-	"github.com/julienschmidt/httprouter"
+	"bitbucket.org/jonathanoliver/docpile/http"
 	"github.com/smartystreets/detour"
+	"github.com/julienschmidt/httprouter"
 
 	stdhttp "net/http"
 )
+
+/*
+
+TODOs
+- event storage
+- loading of events from event storage at startup
+- routing of events to event storage and projections
+- projections
+- tag synonyms
+- rename tag
+- apply/remove tags from documents
+- document search
+- tag search
+- during document search, as combinations of tags are specified,
+    only the remaining intersection of tags is suggested
+
+ */
 
 const workspacePath = "/Users/jonathan/Downloads/docpile"
 
