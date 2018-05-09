@@ -14,18 +14,18 @@ import (
 )
 
 /*
-
 TODOs
-- event storage
 - loading of events from event storage at startup
 - routing of events to event storage and projections
 - projections
+
+- tag "synonym" vs "alias" (which word is better)
 - apply/remove tags from documents
+
 - document search
-- tag search
+- tag search (finding tags that match partial text)
 - during document search, as combinations of tags are specified,
     only the remaining intersection of tags is suggested
-
 */
 
 const workspacePath = "/Users/jonathan/Downloads/docpile"
@@ -47,7 +47,7 @@ func main() {
 	router.Handler("PUT", "/tags", detour.New(tagController.Add))
 	router.Handler("POST", "/tags/:id", detour.New(tagController.Rename))
 	router.Handler("PUT", "/tags/:id/synonyn", detour.New(tagController.DefineSynonym))
-	//router.Handler("DELETE", "/tags/:id/synonyn", detour.New(tagController.RemoveSynonym))
+	router.Handler("DELETE", "/tags/:id/synonyn", detour.New(tagController.RemoveSynonym))
 	router.Handler("PUT", "/assets", detour.New(assetController.ImportManaged))
 	router.Handler("PUT", "/documents", detour.New(documentController.Define))
 
