@@ -30,5 +30,5 @@ func (this *RenameTag) Validate() error {
 
 var (
 	missingTagIDError = fieldError("A tag ID is required.", jsonTagIDField)
-	TagNotFoundResult = notFoundResult("", jsonTagIDField)
+	TagNotFoundResult = notFoundResult("The tag ID was not found.", jsonTagIDField)
 )
