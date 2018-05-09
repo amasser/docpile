@@ -40,7 +40,7 @@ func (this *LocalStorageHandler) handleImportManagedStreamingAsset(message domai
 		return 0, err
 	}
 
-	if err := this.writeBuffer(message.Name, id, buffer); err != nil {
+	if err := this.writeBuffer(id, message.Name, buffer); err != nil {
 		panic(err) // because we don't have a compensating event, we panic so the event never happens
 	}
 
@@ -54,8 +54,8 @@ func (this *LocalStorageHandler) sendMessage(name, mime string, buffer *bytes.Bu
 		Hash:     computeHash(buffer),
 	})
 }
-func (this *LocalStorageHandler) writeBuffer(originalFilename string, id uint64, buffer *bytes.Buffer) error {
-	filename := fmt.Sprintf("%d%s", id, path.Ext(originalFilename))
+func (this *LocalStorageHandler) writeBuffer(id uint64, name string, buffer *bytes.Buffer) error {
+	filename := fmt.Sprintf("%d%s", id, path.Ext(name))
 	source := ioutil.NopCloser(buffer)
 	return this.writer.Write(filename, source)
 }

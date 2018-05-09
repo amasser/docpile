@@ -18,6 +18,7 @@ type ManagedAssetImported struct {
 	Hash      SHA256Hash `json:"sha256"`
 	MIMEType  string     `json:"mime_type"`
 	Name      string     `json:"name"`
+	Key       string     `json:"key"`
 }
 
 // NOTE: this could simply be for resources which are unmanaged rather than cloud

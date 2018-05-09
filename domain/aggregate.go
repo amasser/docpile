@@ -3,6 +3,7 @@ package domain
 import (
 	"fmt"
 	"log"
+	"path"
 	"reflect"
 	"strings"
 
@@ -58,6 +59,7 @@ func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256H
 		Hash:      events.SHA256Hash(hash),
 		MIMEType:  mime,
 		Name:      name,
+		Key:       fmt.Sprintf("%d%s", id, path.Ext(name)),
 	})
 }
 func (this *Aggregate) ImportCloudAsset(name, provider, resource string) (uint64, error) {
