@@ -22,10 +22,10 @@ func (this *ImportManagedAsset) Bind(request *http.Request) error {
 		return badAssetError
 	}
 
-	this.Name = header.Filename
-	this.Reader = reader
+	this.Name = normalizeFilename(header.Filename)
 	this.MIMEType = this.computeMIMEType()
 	this.Size = uint64(header.Size)
+	this.Reader = reader
 
 	return nil
 }
@@ -43,7 +43,7 @@ func (this *ImportManagedAsset) Validate() error {
 }
 
 func (this *ImportManagedAsset) computeMIMEType() string {
-	switch path.Ext(strings.ToLower(this.Name)) {
+	switch path.Ext(this.Name) {
 	case ".pdf":
 		return "application/pdf"
 	case ".doc":
@@ -60,6 +60,19 @@ func (this *ImportManagedAsset) computeMIMEType() string {
 		return "application/vnd.oasis.opendocument.text"
 	default:
 		return ""
+	}
+}
+
+func normalizeFilename(value string) string {
+	value = strings.TrimSpace(value)
+	base := path.Base(value)
+	switch base {
+	case ".":
+		return ""
+	case "/":
+		return ""
+	default:
+		return base + strings.ToLower(path.Ext(base))
 	}
 }
 
