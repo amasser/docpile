@@ -29,7 +29,7 @@ TODOs
     only the remaining intersection of tags is suggested
 */
 
-const workspacePath = "/Users/jonathan/Downloads/docpile"
+const workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
 
 func main() {
 	identity := domain.NewEpochGenerator()
@@ -37,8 +37,8 @@ func main() {
 
 	applicator := &Applicator{} // TODO
 
-	mutex := &sync.RWMutex{}
-	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator, mutex)
+	writeMutex := &sync.RWMutex{}
+	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator, writeMutex)
 	handler = storage.NewLocalStorageHandler(handler, storage.NewLocalStorage(workspacePath))
 
 	tagController := http.NewTagWriteController(handler)
