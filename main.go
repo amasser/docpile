@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"sync"
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/http"
@@ -36,7 +37,8 @@ func main() {
 
 	applicator := &Applicator{} // TODO
 
-	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator)
+	mutex := &sync.RWMutex{}
+	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator, mutex)
 	handler = storage.NewLocalStorageHandler(handler, storage.NewLocalStorage(workspacePath))
 
 	tagController := http.NewTagController(handler)
@@ -50,6 +52,9 @@ func main() {
 	router.Handler("DELETE", "/tags/:id/synonyn", detour.New(tagController.RemoveSynonym))
 	router.Handler("PUT", "/assets", detour.New(assetController.ImportManaged))
 	router.Handler("PUT", "/documents", detour.New(documentController.Define))
+
+	// GET /search/documents = document search criteria
+	// GET /search/tags = tag auto-complete search
 
 	// apply/remove one or more tags to a single document
 	//   PUT /documents/:id/tags

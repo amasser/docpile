@@ -9,13 +9,17 @@ import (
 type MessageHandler struct {
 	root       *Aggregate
 	applicator Applicator
+	mutex      Mutex
 }
 
-func NewMessageHandler(root *Aggregate, applicator Applicator) *MessageHandler {
-	return &MessageHandler{root: root, applicator: applicator}
+func NewMessageHandler(root *Aggregate, applicator Applicator, mutex Mutex) *MessageHandler {
+	return &MessageHandler{root: root, applicator: applicator, mutex: mutex}
 }
 
 func (this *MessageHandler) Handle(message interface{}) (uint64, error) {
+	defer this.mutex.Unlock()
+	this.mutex.Lock()
+
 	if id, err := this.handle(message); err != nil {
 		return 0, err
 	} else {
