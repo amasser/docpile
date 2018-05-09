@@ -14,8 +14,8 @@ func NewAssetController(handler domain.Handler) *AssetController {
 	return &AssetController{handler: handler}
 }
 
-func (this *AssetController) Import(input *inputs.ImportManagedAsset) detour.Renderer {
-	if assetID, err := this.importAsset(input); err == nil {
+func (this *AssetController) ImportManaged(input *inputs.ImportManagedAsset) detour.Renderer {
+	if assetID, err := this.importManaged(input); err == nil {
 		return newEntityResult(assetID)
 	} else if err == domain.AssetAlreadyExistsError {
 		return inputs.DuplicateAssetResult
@@ -25,7 +25,7 @@ func (this *AssetController) Import(input *inputs.ImportManagedAsset) detour.Ren
 		return UnknownErrorResult
 	}
 }
-func (this *AssetController) importAsset(input *inputs.ImportManagedAsset) (uint64, error) {
+func (this *AssetController) importManaged(input *inputs.ImportManagedAsset) (uint64, error) {
 	return this.handler.Handle(domain.ImportManagedStreamingAsset{
 		Name:     input.Name,
 		MIMEType: input.MIMEType,

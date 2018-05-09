@@ -11,8 +11,8 @@ type MessageHandler struct {
 	applicator Applicator
 }
 
-func NewMessageHandler(app *Aggregate) *MessageHandler {
-	return &MessageHandler{root: app}
+func NewMessageHandler(root *Aggregate, applicator Applicator) *MessageHandler {
+	return &MessageHandler{root: root, applicator: applicator}
 }
 
 func (this *MessageHandler) Handle(message interface{}) (uint64, error) {

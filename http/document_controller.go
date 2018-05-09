@@ -14,8 +14,8 @@ func NewDocumentController(handler domain.Handler) *DocumentController {
 	return &DocumentController{handler: handler}
 }
 
-func (this *DocumentController) Add(input *inputs.DefineDocument) detour.Renderer {
-	if documentID, err := this.add(input); err == nil {
+func (this *DocumentController) Define(input *inputs.DefineDocument) detour.Renderer {
+	if documentID, err := this.define(input); err == nil {
 		return newEntityResult(documentID)
 	} else if err == domain.AssetNotFoundError {
 		return inputs.AssetDoesNotExistResult
@@ -27,7 +27,7 @@ func (this *DocumentController) Add(input *inputs.DefineDocument) detour.Rendere
 		return UnknownErrorResult
 	}
 }
-func (this *DocumentController) add(input *inputs.DefineDocument) (uint64, error) {
+func (this *DocumentController) define(input *inputs.DefineDocument) (uint64, error) {
 	return this.handler.Handle(domain.DefineDocument{
 		Document: domain.DocumentDefinition{
 			AssetID:     input.AssetID,
