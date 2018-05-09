@@ -50,8 +50,8 @@ func (this *Aggregate) AddTag(name string) (uint64, error) {
 func (this *Aggregate) RenameTag(id uint64, name string) (uint64, error) {
 	if _, contains := this.tagsByID[id]; !contains {
 		return 0, TagNotFoundError
-	} else if _, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
-		return 0, TagAlreadyExistsError
+	} else if id, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
+		return id, TagAlreadyExistsError
 	}
 
 	return id, this.raise(events.TagRenamed{
@@ -61,6 +61,23 @@ func (this *Aggregate) RenameTag(id uint64, name string) (uint64, error) {
 		NewName:   name,
 	})
 }
+func (this *Aggregate) DefineTagSynonym(id uint64, name string) (uint64, error) {
+	if _, contains := this.tagsByID[id]; !contains {
+		return 0, TagNotFoundError
+	} else if id, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
+		return id, TagAlreadyExistsError
+	}
+
+	return id, this.raise(events.TagSynonymDefined{
+		TagID:     id,
+		Timestamp: this.clock.UTCNow(),
+		TagName:   name,
+	})
+}
+func normalizeTag(value string) string {
+	return strings.ToLower(value)
+}
+
 func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256Hash) (uint64, error) {
 	if id, contains := this.managedAssets[managedKey(hash)]; contains {
 		return id, AssetAlreadyExistsError
@@ -90,6 +107,7 @@ func (this *Aggregate) ImportCloudAsset(name, provider, resource string) (uint64
 		Resource:  resource,
 	})
 }
+
 func (this *Aggregate) DefineDocument(doc DocumentDefinition) (uint64, error) {
 	if err := this.validDefinition(doc); err != nil {
 		return 0, err
@@ -143,20 +161,26 @@ func (this *Aggregate) Apply(messages ...interface{}) {
 }
 func (this *Aggregate) apply(message interface{}) {
 	switch message := message.(type) {
+
 	case events.TagAdded:
 		this.applyTagAdded(message)
 	case events.TagRenamed:
 		this.applyTagRenamed(message)
+	case events.TagSynonymDefined:
+		this.applyTagSynonymDefined(message)
+
 	case events.ManagedAssetImported:
 		this.applyManagedAssetImported(message)
 	case events.CloudAssetImported:
 		this.applyCloudAssetImported(message)
+
 	case events.DocumentDefined:
 		this.applyDocumentDefined(message)
 	default:
 		log.Panicf(fmt.Sprintf("Aggregate cannot apply '%s'", reflect.TypeOf(message)))
 	}
 }
+
 func (this *Aggregate) applyTagAdded(message events.TagAdded) {
 	this.tagsByID[message.TagID] = message.TagName // full, not-normalized value
 	this.tagsByNormalizedName[normalizeTag(message.TagName)] = message.TagID
@@ -166,6 +190,10 @@ func (this *Aggregate) applyTagRenamed(message events.TagRenamed) {
 	delete(this.tagsByNormalizedName, normalizeTag(message.OldName))
 	this.tagsByNormalizedName[normalizeTag(message.NewName)] = message.TagID
 }
+func (this *Aggregate) applyTagSynonymDefined(message events.TagSynonymDefined) {
+	this.tagsByNormalizedName[normalizeTag(message.TagName)] = message.TagID
+}
+
 func (this *Aggregate) applyManagedAssetImported(message events.ManagedAssetImported) {
 	this.assetsByID[message.AssetID] = struct{}{}
 	this.managedAssets[managedKey(message.Hash)] = message.AssetID
@@ -174,6 +202,7 @@ func (this *Aggregate) applyCloudAssetImported(message events.CloudAssetImported
 	this.assetsByID[message.AssetID] = struct{}{}
 	this.cloudAssets[newCloudAssetKey(message.Provider, message.Resource)] = struct{}{}
 }
+
 func (this *Aggregate) applyDocumentDefined(message events.DocumentDefined) {
 	this.documentsByID[message.DocumentID] = struct{}{}
 }
@@ -182,8 +211,4 @@ func (this *Aggregate) Consume() []interface{} {
 	consumed := this.events
 	this.events = nil // don't re-use the buffer
 	return consumed
-}
-
-func normalizeTag(value string) string {
-	return strings.ToLower(value)
 }

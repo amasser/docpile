@@ -20,7 +20,7 @@ TODOs
 - loading of events from event storage at startup
 - routing of events to event storage and projections
 - projections
-- tag synonyms
+- remove tag synonym
 - apply/remove tags from documents
 - document search
 - tag search
@@ -46,7 +46,9 @@ func main() {
 
 	router := buildRouter()
 	router.Handler("PUT", "/tags", detour.New(tagController.Add))
-	router.Handler("POST", "/tags", detour.New(tagController.Rename))
+	router.Handler("POST", "/tags/:id", detour.New(tagController.Rename))
+	router.Handler("PUT", "/tags/:id/synonyn", detour.New(tagController.DefineSynonym))
+	//router.Handler("DELETE", "/tags/:id/synonyn", detour.New(tagController.RemoveSynonym))
 	router.Handler("PUT", "/assets", detour.New(assetController.ImportManaged))
 	router.Handler("PUT", "/documents", detour.New(documentController.Define))
 

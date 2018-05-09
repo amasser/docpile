@@ -12,6 +12,10 @@ type RenameTag struct {
 	ID   uint64
 	Name string
 }
+type DefineTagSynonym struct {
+	ID   uint64
+	Name string
+}
 
 type ImportManagedStreamingAsset struct {
 	Name     string

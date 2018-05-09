@@ -45,3 +45,22 @@ func (this *TagController) rename(input *inputs.RenameTag) error {
 	})
 	return err
 }
+
+func (this *TagController) DefineSynonym(input *inputs.DefineTagSynonym) detour.Renderer {
+	if err := this.defineSynonym(input); err == nil {
+		return nil
+	} else if err == domain.TagAlreadyExistsError {
+		return inputs.DuplicateTagResult
+	} else if err == domain.TagNotFoundError {
+		return inputs.TagNotFoundResult
+	} else {
+		return UnknownErrorResult
+	}
+}
+func (this *TagController) defineSynonym(input *inputs.DefineTagSynonym) error {
+	_, err := this.handler.Handle(domain.DefineTagSynonym{
+		ID:   input.ID,
+		Name: input.Name,
+	})
+	return err
+}
