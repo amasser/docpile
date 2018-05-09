@@ -52,7 +52,7 @@ func containsDuplicate(values []uint64) bool {
 }
 
 var (
-	beforeMustComeFirstError   = fieldError("The begin date must come before the end date.", jsonPeriodBeginField, jsonPeriodEndField)
+	beforeMustComeFirstError   = fieldError("The begin date must come on or before the end date.", jsonPeriodBeginField, jsonPeriodEndField)
 	endMustHaveABeforeError    = fieldError("When an end date is specified it must have a begin date.", jsonPeriodBeginField, jsonPeriodEndField)
 	duplicateTagError          = fieldError("The tag IDs provided must be unique.", jsonTagsField)
 	duplicateDocumentError     = fieldError("The document IDs provided must be unique.", jsonDocumentsField)
