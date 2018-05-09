@@ -47,9 +47,10 @@ func main() {
 
 	router := buildRouter()
 	router.Handler("PUT", "/tags", detour.New(tagController.Add))
-	router.Handler("POST", "/tags/:id", detour.New(tagController.Rename))
-	router.Handler("PUT", "/tags/:id/synonyn", detour.New(tagController.DefineSynonym))
-	router.Handler("DELETE", "/tags/:id/synonyn", detour.New(tagController.RemoveSynonym))
+	router.Handler("POST", "/tags/name", detour.New(tagController.Rename))
+	router.Handler("PUT", "/tags/synonym", detour.New(tagController.DefineSynonym))
+	router.Handler("DELETE", "/tags/synonym", detour.New(tagController.RemoveSynonym))
+
 	router.Handler("PUT", "/assets", detour.New(assetController.ImportManaged))
 	router.Handler("PUT", "/documents", detour.New(documentController.Define))
 
