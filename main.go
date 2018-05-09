@@ -34,9 +34,11 @@ func main() {
 	identity := domain.NewEpochGenerator()
 	aggregate := domain.NewAggregate(identity)
 
-	applicator := &Applicator{} // TODO
+	var applicator domain.Applicator = &Applicator{}
+	applicator = domain.NewChannelApplicator(applicator).Start()
 
 	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator)
+	handler = domain.NewChannelHandler(handler).Start()
 	handler = storage.NewLocalStorageHandler(handler, storage.NewLocalStorage(workspacePath))
 
 	tagController := http.NewTagWriteController(handler)
