@@ -16,9 +16,9 @@ type Aggregate struct {
 	clock         *clock.Clock
 	identity      IdentityGenerator
 	tagsByID      map[uint64]struct{}
-	tagsByName    map[string]struct{}
+	tagsByName    map[string]uint64
 	assetsByID    map[uint64]struct{}
-	managedAssets map[managedKey]struct{}
+	managedAssets map[managedKey]uint64
 	cloudAssets   map[cloudKey]struct{}
 	documentsByID map[uint64]struct{}
 }
@@ -27,17 +27,17 @@ func NewAggregate(identity IdentityGenerator) *Aggregate {
 	return &Aggregate{
 		identity:      identity,
 		tagsByID:      make(map[uint64]struct{}),
-		tagsByName:    make(map[string]struct{}),
+		tagsByName:    make(map[string]uint64),
 		assetsByID:    make(map[uint64]struct{}),
-		managedAssets: make(map[managedKey]struct{}),
+		managedAssets: make(map[managedKey]uint64),
 		cloudAssets:   make(map[cloudKey]struct{}),
 		documentsByID: make(map[uint64]struct{}),
 	}
 }
 
 func (this *Aggregate) AddTag(name string) (uint64, error) {
-	if _, contains := this.tagsByName[strings.ToLower(name)]; contains {
-		return 0, TagAlreadyExistsError
+	if id, contains := this.tagsByName[strings.ToLower(name)]; contains {
+		return id, TagAlreadyExistsError
 	}
 
 	id := this.identity.Next()
@@ -48,8 +48,8 @@ func (this *Aggregate) AddTag(name string) (uint64, error) {
 	})
 }
 func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256Hash) (uint64, error) {
-	if _, contains := this.managedAssets[managedKey(hash)]; contains {
-		return 0, AssetAlreadyExistsError
+	if id, contains := this.managedAssets[managedKey(hash)]; contains {
+		return id, AssetAlreadyExistsError
 	}
 
 	id := this.identity.Next()
@@ -143,11 +143,11 @@ func (this *Aggregate) apply(message interface{}) {
 }
 func (this *Aggregate) applyTagAdded(message events.TagAdded) {
 	this.tagsByID[message.TagID] = struct{}{}
-	this.tagsByName[strings.ToLower(message.TagName)] = struct{}{}
+	this.tagsByName[strings.ToLower(message.TagName)] = message.TagID
 }
 func (this *Aggregate) applyManagedAssetImported(message events.ManagedAssetImported) {
 	this.assetsByID[message.AssetID] = struct{}{}
-	this.managedAssets[managedKey(message.Hash)] = struct{}{}
+	this.managedAssets[managedKey(message.Hash)] = message.AssetID
 }
 func (this *Aggregate) applyCloudAssetImported(message events.CloudAssetImported) {
 	this.assetsByID[message.AssetID] = struct{}{}
