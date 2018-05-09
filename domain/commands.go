@@ -12,6 +12,7 @@ type AddTag struct {
 type ImportManagedStreamingAsset struct {
 	Name     string
 	MIMEType string
+	Size     uint64
 	Body     io.ReadCloser
 }
 type ImportManagedAsset struct {

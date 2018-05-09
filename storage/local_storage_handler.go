@@ -12,8 +12,8 @@ import (
 )
 
 type LocalStorageHandler struct {
-	inner     domain.Handler
-	writer    Writer
+	inner  domain.Handler
+	writer Writer
 }
 
 func NewLocalStorageHandler(inner domain.Handler, writer Writer) *LocalStorageHandler {
@@ -29,7 +29,7 @@ func (this *LocalStorageHandler) Handle(message interface{}) (uint64, error) {
 	}
 }
 func (this *LocalStorageHandler) handleImportManagedStreamingAsset(message domain.ImportManagedStreamingAsset) (uint64, error) {
-	buffer, err := bufferStream(message.Body)
+	buffer, err := bufferStream(message.Size, message.Body)
 	if err != nil {
 		return 0, err
 	}
@@ -59,9 +59,9 @@ func (this *LocalStorageHandler) writeBuffer(id uint64, buffer *bytes.Buffer) er
 	return this.writer.Write(filename, source)
 }
 
-func bufferStream(reader io.ReadCloser) (*bytes.Buffer, error) {
+func bufferStream(size uint64, reader io.ReadCloser) (*bytes.Buffer, error) {
 	defer reader.Close()
-	buffer := bytes.NewBuffer([]byte{})
+	buffer := bytes.NewBuffer(make([]byte, int(size)))
 	if _, err := io.Copy(buffer, reader); err == nil {
 		return buffer, nil
 	} else {

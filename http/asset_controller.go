@@ -29,6 +29,7 @@ func (this *AssetController) importAsset(input *inputs.ImportManagedAsset) (uint
 	return this.handler.Handle(domain.ImportManagedStreamingAsset{
 		Name:     input.Name,
 		MIMEType: input.MIMEType,
+		Size:     input.Size,
 		Body:     input.Reader,
 	})
 }

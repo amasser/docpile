@@ -10,10 +10,10 @@ import (
 )
 
 type ImportManagedAsset struct {
-	Name          string
-	Reader        io.ReadCloser
-	MIMEType      string
-	contentLength uint64
+	Name     string
+	MIMEType string
+	Size     uint64
+	Reader   io.ReadCloser
 }
 
 func (this *ImportManagedAsset) Bind(request *http.Request) error {
@@ -25,7 +25,7 @@ func (this *ImportManagedAsset) Bind(request *http.Request) error {
 	this.Name = header.Filename
 	this.Reader = reader
 	this.MIMEType = this.computeMIMEType()
-	this.contentLength = uint64(header.Size)
+	this.Size = uint64(header.Size)
 
 	return nil
 }
@@ -37,7 +37,7 @@ func (this *ImportManagedAsset) Sanitize() {
 func (this *ImportManagedAsset) Validate() error {
 	var errors detour.Errors
 	errors = errors.AppendIf(filenameError, len(this.Name) == 0)
-	errors = errors.AppendIf(emptyAssetError, this.contentLength == 0)
+	errors = errors.AppendIf(emptyAssetError, this.Size == 0)
 	errors = errors.AppendIf(unsupportedTypeError, len(this.MIMEType) == 0)
 	return errors
 }
