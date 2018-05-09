@@ -20,7 +20,6 @@ TODOs
 - loading of events from event storage at startup
 - routing of events to event storage and projections
 - projections
-- remove tag synonym
 - apply/remove tags from documents
 - document search
 - tag search
