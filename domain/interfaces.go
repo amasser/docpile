@@ -8,10 +8,6 @@ import (
 type IdentityGenerator interface {
 	Next() uint64
 }
-type Mutex interface {
-	Lock()
-	Unlock()
-}
 
 var (
 	TagAlreadyExistsError   = errors.New("tag already exists")

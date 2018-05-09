@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"sync"
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/http"
@@ -37,8 +36,7 @@ func main() {
 
 	applicator := &Applicator{} // TODO
 
-	writeMutex := &sync.RWMutex{}
-	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator, writeMutex)
+	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator)
 	handler = storage.NewLocalStorageHandler(handler, storage.NewLocalStorage(workspacePath))
 
 	tagController := http.NewTagWriteController(handler)
