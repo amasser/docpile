@@ -22,11 +22,11 @@ func (this *AddTag) Sanitize() {
 
 func (this *AddTag) Validate() error {
 	var errors detour.Errors
-	errors = errors.AppendIf(missingTagError, len(this.Name) == 0)
+	errors = errors.AppendIf(missingTagNameError, len(this.Name) == 0)
 	return errors
 }
 
 var (
-	missingTagError    = fieldError("A tag name is required.", nameField)
-	DuplicateTagResult = conflictResult("The tag provided already exists.", nameField)
+	missingTagNameError = fieldError("A tag name is required.", jsonNameField)
+	DuplicateTagResult  = conflictResult("The tag provided already exists.", jsonNameField)
 )

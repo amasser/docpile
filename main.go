@@ -21,7 +21,6 @@ TODOs
 - routing of events to event storage and projections
 - projections
 - tag synonyms
-- rename tag
 - apply/remove tags from documents
 - document search
 - tag search
@@ -47,6 +46,7 @@ func main() {
 
 	router := buildRouter()
 	router.Handler("PUT", "/tags", detour.New(tagController.Add))
+	router.Handler("POST", "/tags", detour.New(tagController.Rename))
 	router.Handler("PUT", "/assets", detour.New(assetController.ImportManaged))
 	router.Handler("PUT", "/documents", detour.New(documentController.Define))
 

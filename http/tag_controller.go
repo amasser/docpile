@@ -26,3 +26,22 @@ func (this *TagController) Add(input *inputs.AddTag) detour.Renderer {
 func (this *TagController) add(input *inputs.AddTag) (uint64, error) {
 	return this.handler.Handle(domain.AddTag{Name: input.Name})
 }
+
+func (this *TagController) Rename(input *inputs.RenameTag) detour.Renderer {
+	if err := this.rename(input); err == nil {
+		return nil
+	} else if err == domain.TagAlreadyExistsError {
+		return inputs.DuplicateTagResult
+	} else if err == domain.TagNotFoundError {
+		return inputs.TagNotFoundResult
+	} else {
+		return UnknownErrorResult
+	}
+}
+func (this *TagController) rename(input *inputs.RenameTag) error {
+	_, err := this.handler.Handle(domain.RenameTag{
+		ID:   input.ID,
+		Name: input.Name,
+	})
+	return err
+}

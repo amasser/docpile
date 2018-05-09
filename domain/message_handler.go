@@ -27,6 +27,8 @@ func (this *MessageHandler) handle(message interface{}) (uint64, error) {
 	switch message := message.(type) {
 	case AddTag:
 		return this.root.AddTag(message.Name)
+	case RenameTag:
+		return this.root.RenameTag(message.ID, message.Name)
 	case ImportManagedAsset:
 		return this.root.ImportManagedAsset(message.Name, message.MIMEType, message.Hash)
 	case ImportCloudAsset:

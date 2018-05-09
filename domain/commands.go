@@ -8,6 +8,10 @@ import (
 type AddTag struct {
 	Name string
 }
+type RenameTag struct {
+	ID   uint64
+	Name string
+}
 
 type ImportManagedStreamingAsset struct {
 	Name     string

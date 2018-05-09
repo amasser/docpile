@@ -11,6 +11,12 @@ type TagAdded struct {
 	Timestamp time.Time `json:"timestamp"`
 	TagName   string    `json:"tag_name"`
 }
+type TagRenamed struct {
+	TagID     uint64    `json:"tag_id"`
+	Timestamp time.Time `json:"timestamp"`
+	OldName   string    `json:"old_name"`
+	NewName   string    `json:"new_name"`
+}
 
 type ManagedAssetImported struct {
 	AssetID   uint64     `json:"asset_id"`

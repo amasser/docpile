@@ -12,31 +12,31 @@ import (
 )
 
 type Aggregate struct {
-	events        []interface{}
-	clock         *clock.Clock
-	identity      IdentityGenerator
-	tagsByID      map[uint64]struct{}
-	tagsByName    map[string]uint64
-	assetsByID    map[uint64]struct{}
-	managedAssets map[managedKey]uint64
-	cloudAssets   map[cloudKey]struct{}
-	documentsByID map[uint64]struct{}
+	events               []interface{}
+	clock                *clock.Clock
+	identity             IdentityGenerator
+	tagsByID             map[uint64]string
+	tagsByNormalizedName map[string]uint64
+	assetsByID           map[uint64]struct{}
+	managedAssets        map[managedKey]uint64
+	cloudAssets          map[cloudKey]struct{}
+	documentsByID        map[uint64]struct{}
 }
 
 func NewAggregate(identity IdentityGenerator) *Aggregate {
 	return &Aggregate{
-		identity:      identity,
-		tagsByID:      make(map[uint64]struct{}),
-		tagsByName:    make(map[string]uint64),
-		assetsByID:    make(map[uint64]struct{}),
-		managedAssets: make(map[managedKey]uint64),
-		cloudAssets:   make(map[cloudKey]struct{}),
-		documentsByID: make(map[uint64]struct{}),
+		identity:             identity,
+		tagsByID:             make(map[uint64]string),
+		tagsByNormalizedName: make(map[string]uint64),
+		assetsByID:           make(map[uint64]struct{}),
+		managedAssets:        make(map[managedKey]uint64),
+		cloudAssets:          make(map[cloudKey]struct{}),
+		documentsByID:        make(map[uint64]struct{}),
 	}
 }
 
 func (this *Aggregate) AddTag(name string) (uint64, error) {
-	if id, contains := this.tagsByName[strings.ToLower(name)]; contains {
+	if id, contains := this.tagsByNormalizedName[normalizeTag(name)]; contains {
 		return id, TagAlreadyExistsError
 	}
 
@@ -45,6 +45,20 @@ func (this *Aggregate) AddTag(name string) (uint64, error) {
 		TagID:     id,
 		Timestamp: this.clock.UTCNow(),
 		TagName:   name,
+	})
+}
+func (this *Aggregate) RenameTag(id uint64, name string) (uint64, error) {
+	if _, contains := this.tagsByID[id]; !contains {
+		return 0, TagNotFoundError
+	} else if _, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
+		return 0, TagAlreadyExistsError
+	}
+
+	return id, this.raise(events.TagRenamed{
+		TagID:     id,
+		Timestamp: this.clock.UTCNow(),
+		OldName:   this.tagsByID[id],
+		NewName:   name,
 	})
 }
 func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256Hash) (uint64, error) {
@@ -131,6 +145,8 @@ func (this *Aggregate) apply(message interface{}) {
 	switch message := message.(type) {
 	case events.TagAdded:
 		this.applyTagAdded(message)
+	case events.TagRenamed:
+		this.applyTagRenamed(message)
 	case events.ManagedAssetImported:
 		this.applyManagedAssetImported(message)
 	case events.CloudAssetImported:
@@ -142,8 +158,13 @@ func (this *Aggregate) apply(message interface{}) {
 	}
 }
 func (this *Aggregate) applyTagAdded(message events.TagAdded) {
-	this.tagsByID[message.TagID] = struct{}{}
-	this.tagsByName[strings.ToLower(message.TagName)] = message.TagID
+	this.tagsByID[message.TagID] = message.TagName // full, not-normalized value
+	this.tagsByNormalizedName[normalizeTag(message.TagName)] = message.TagID
+}
+func (this *Aggregate) applyTagRenamed(message events.TagRenamed) {
+	this.tagsByID[message.TagID] = message.NewName // full, not-normalized value
+	delete(this.tagsByNormalizedName, normalizeTag(message.OldName))
+	this.tagsByNormalizedName[normalizeTag(message.NewName)] = message.TagID
 }
 func (this *Aggregate) applyManagedAssetImported(message events.ManagedAssetImported) {
 	this.assetsByID[message.AssetID] = struct{}{}
@@ -161,4 +182,8 @@ func (this *Aggregate) Consume() []interface{} {
 	consumed := this.events
 	this.events = nil // don't re-use the buffer
 	return consumed
+}
+
+func normalizeTag(value string) string {
+	return strings.ToLower(value)
 }
