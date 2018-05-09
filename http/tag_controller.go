@@ -15,59 +15,24 @@ func NewTagController(handler domain.Handler) *TagController {
 }
 
 func (this *TagController) Add(input *inputs.AddTag) detour.Renderer {
-	if tagID, err := this.add(input); err == nil {
-		return newEntityResult(tagID)
-	} else if err == domain.TagAlreadyExistsError {
-		return inputs.DuplicateTagResult
-	} else {
-		return UnknownErrorResult
-	}
+	return this.renderTagResult(domain.AddTag{Name: input.Name})
 }
-func (this *TagController) add(input *inputs.AddTag) (uint64, error) {
-	return this.handler.Handle(domain.AddTag{Name: input.Name})
-}
-
 func (this *TagController) Rename(input *inputs.RenameTag) detour.Renderer {
-	if err := this.rename(input); err == nil {
-		return nil
-	} else if err == domain.TagAlreadyExistsError {
-		return inputs.DuplicateTagResult
-	} else if err == domain.TagNotFoundError {
-		return inputs.TagNotFoundResult
-	} else {
-		return UnknownErrorResult
-	}
-}
-func (this *TagController) rename(input *inputs.RenameTag) error {
-	_, err := this.handler.Handle(domain.RenameTag{
-		ID:   input.ID,
-		Name: input.Name,
-	})
-	return err
+	return this.renderTagResult(domain.RenameTag{ID: input.ID, Name: input.Name})
 }
 
 func (this *TagController) DefineSynonym(input *inputs.DefineTagSynonym) detour.Renderer {
-	if err := this.defineSynonym(input); err == nil {
-		return nil
-	} else if err == domain.TagAlreadyExistsError {
-		return inputs.DuplicateTagResult
-	} else if err == domain.TagNotFoundError {
-		return inputs.TagNotFoundResult
-	} else {
-		return UnknownErrorResult
-	}
+	return this.renderTagResult(domain.DefineTagSynonym{ID: input.ID, Name: input.Name})
 }
-func (this *TagController) defineSynonym(input *inputs.DefineTagSynonym) error {
-	_, err := this.handler.Handle(domain.DefineTagSynonym{
-		ID:   input.ID,
-		Name: input.Name,
-	})
-	return err
+func (this *TagController) RemoveSynonym(input *inputs.RemoveTagSynonym) detour.Renderer {
+	return this.renderTagResult(domain.RemoveTagSynonym{ID: input.ID, Name: input.Name})
 }
 
-func (this *TagController) RemoveSynonym(input *inputs.RemoveTagSynonym) detour.Renderer {
-	if err := this.removeSynonym(input); err == nil {
+func (this *TagController) renderTagResult(message interface{}) detour.Renderer {
+	if id, err := this.handler.Handle(message); id == 0 && err == nil {
 		return nil
+	} else if id > 0 && err == nil {
+		return newEntityResult(id)
 	} else if err == domain.TagAlreadyExistsError {
 		return inputs.DuplicateTagResult
 	} else if err == domain.TagNotFoundError {
@@ -75,11 +40,4 @@ func (this *TagController) RemoveSynonym(input *inputs.RemoveTagSynonym) detour.
 	} else {
 		return UnknownErrorResult
 	}
-}
-func (this *TagController) removeSynonym(input *inputs.RemoveTagSynonym) error {
-	_, err := this.handler.Handle(domain.RemoveTagSynonym{
-		ID:   input.ID,
-		Name: input.Name,
-	})
-	return err
 }
