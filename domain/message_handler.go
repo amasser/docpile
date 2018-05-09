@@ -32,6 +32,8 @@ func (this *MessageHandler) handle(message interface{}) (uint64, error) {
 		return this.root.RenameTag(message.ID, message.Name)
 	case DefineTagSynonym:
 		return this.root.DefineTagSynonym(message.ID, message.Name)
+	case RemoveTagSynonym:
+		return this.root.RemoveTagSynonym(message.ID, message.Name)
 
 	case ImportManagedAsset:
 		return this.root.ImportManagedAsset(message.Name, message.MIMEType, message.Hash)

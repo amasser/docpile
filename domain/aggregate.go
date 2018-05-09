@@ -74,6 +74,19 @@ func (this *Aggregate) DefineTagSynonym(id uint64, name string) (uint64, error) 
 		TagName:   name,
 	})
 }
+func (this *Aggregate) RemoveTagSynonym(id uint64, name string) (uint64, error) {
+	if _, contains := this.tagsByID[id]; !contains {
+		return 0, TagNotFoundError
+	} else if id, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
+		return id, TagAlreadyExistsError
+	}
+
+	return id, this.raise(events.TagSynonymRemoved{
+		TagID:     id,
+		Timestamp: this.clock.UTCNow(),
+		TagName:   name,
+	})
+}
 func normalizeTag(value string) string {
 	return strings.ToLower(value)
 }
@@ -168,6 +181,8 @@ func (this *Aggregate) apply(message interface{}) {
 		this.applyTagRenamed(message)
 	case events.TagSynonymDefined:
 		this.applyTagSynonymDefined(message)
+	case events.TagSynonymRemoved:
+		this.applyTagSynonymRemoved(message)
 
 	case events.ManagedAssetImported:
 		this.applyManagedAssetImported(message)
@@ -192,6 +207,9 @@ func (this *Aggregate) applyTagRenamed(message events.TagRenamed) {
 }
 func (this *Aggregate) applyTagSynonymDefined(message events.TagSynonymDefined) {
 	this.tagsByNormalizedName[normalizeTag(message.TagName)] = message.TagID
+}
+func (this *Aggregate) applyTagSynonymRemoved(message events.TagSynonymRemoved) {
+	delete(this.tagsByNormalizedName, normalizeTag(message.TagName))
 }
 
 func (this *Aggregate) applyManagedAssetImported(message events.ManagedAssetImported) {

@@ -64,3 +64,22 @@ func (this *TagController) defineSynonym(input *inputs.DefineTagSynonym) error {
 	})
 	return err
 }
+
+func (this *TagController) RemoveSynonym(input *inputs.RemoveTagSynonym) detour.Renderer {
+	if err := this.removeSynonym(input); err == nil {
+		return nil
+	} else if err == domain.TagAlreadyExistsError {
+		return inputs.DuplicateTagResult
+	} else if err == domain.TagNotFoundError {
+		return inputs.TagNotFoundResult
+	} else {
+		return UnknownErrorResult
+	}
+}
+func (this *TagController) removeSynonym(input *inputs.RemoveTagSynonym) error {
+	_, err := this.handler.Handle(domain.RemoveTagSynonym{
+		ID:   input.ID,
+		Name: input.Name,
+	})
+	return err
+}

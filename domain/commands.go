@@ -16,6 +16,10 @@ type DefineTagSynonym struct {
 	ID   uint64
 	Name string
 }
+type RemoveTagSynonym struct {
+	ID   uint64
+	Name string
+}
 
 type ImportManagedStreamingAsset struct {
 	Name     string
