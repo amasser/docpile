@@ -48,10 +48,8 @@ func (this *Aggregate) AddTag(name string) (uint64, error) {
 	})
 }
 func (this *Aggregate) RenameTag(id uint64, name string) (uint64, error) {
-	if _, contains := this.tagsByID[id]; !contains {
-		return 0, TagNotFoundError
-	} else if id, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
-		return id, TagAlreadyExistsError
+	if id, err := this.validTagInput(id, name); err != nil {
+		return id, err
 	}
 
 	return id, this.raise(events.TagRenamed{
@@ -62,10 +60,8 @@ func (this *Aggregate) RenameTag(id uint64, name string) (uint64, error) {
 	})
 }
 func (this *Aggregate) DefineTagSynonym(id uint64, name string) (uint64, error) {
-	if _, contains := this.tagsByID[id]; !contains {
-		return 0, TagNotFoundError
-	} else if id, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
-		return id, TagAlreadyExistsError
+	if id, err := this.validTagInput(id, name); err != nil {
+		return id, err
 	}
 
 	return id, this.raise(events.TagSynonymDefined{
@@ -75,10 +71,8 @@ func (this *Aggregate) DefineTagSynonym(id uint64, name string) (uint64, error) 
 	})
 }
 func (this *Aggregate) RemoveTagSynonym(id uint64, name string) (uint64, error) {
-	if _, contains := this.tagsByID[id]; !contains {
-		return 0, TagNotFoundError
-	} else if id, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
-		return id, TagAlreadyExistsError
+	if id, err := this.validTagInput(id, name); err != nil {
+		return id, err
 	}
 
 	return id, this.raise(events.TagSynonymRemoved{
@@ -86,6 +80,15 @@ func (this *Aggregate) RemoveTagSynonym(id uint64, name string) (uint64, error) 
 		Timestamp: this.clock.UTCNow(),
 		TagName:   name,
 	})
+}
+func (this *Aggregate) validTagInput(id uint64, name string) (uint64, error) {
+	if _, contains := this.tagsByID[id]; !contains {
+		return 0, TagNotFoundError
+	} else if id, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
+		return id, TagAlreadyExistsError
+	} else {
+		return id, nil
+	}
 }
 func normalizeTag(value string) string {
 	return strings.ToLower(value)
