@@ -3,12 +3,13 @@ package storage
 import (
 	"bytes"
 	"crypto/sha256"
+	"fmt"
+	"io"
 	"io/ioutil"
-	"strconv"
+	"path"
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/events"
-	"io"
 )
 
 type LocalStorageHandler struct {
@@ -39,7 +40,7 @@ func (this *LocalStorageHandler) handleImportManagedStreamingAsset(message domai
 		return 0, err
 	}
 
-	if err := this.writeBuffer(id, buffer); err != nil {
+	if err := this.writeBuffer(message.Name, id, buffer); err != nil {
 		panic(err) // because we don't have a compensating event, we panic so the event never happens
 	}
 
@@ -53,8 +54,8 @@ func (this *LocalStorageHandler) sendMessage(name, mime string, buffer *bytes.Bu
 		Hash:     computeHash(buffer),
 	})
 }
-func (this *LocalStorageHandler) writeBuffer(id uint64, buffer *bytes.Buffer) error {
-	filename := strconv.FormatUint(id, 10)
+func (this *LocalStorageHandler) writeBuffer(originalFilename string, id uint64, buffer *bytes.Buffer) error {
+	filename := fmt.Sprintf("%d%s", id, path.Ext(originalFilename))
 	source := ioutil.NopCloser(buffer)
 	return this.writer.Write(filename, source)
 }
