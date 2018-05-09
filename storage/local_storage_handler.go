@@ -14,10 +14,9 @@ import (
 type LocalStorageHandler struct {
 	inner     domain.Handler
 	writer    Writer
-	workspace string
 }
 
-func NewLocalStorageHandler(inner domain.Handler, writer Writer, workspace string) *LocalStorageHandler {
+func NewLocalStorageHandler(inner domain.Handler, writer Writer) *LocalStorageHandler {
 	return &LocalStorageHandler{inner: inner, writer: writer}
 }
 
