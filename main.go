@@ -5,10 +5,10 @@ import (
 	"log"
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
-	"bitbucket.org/jonathanoliver/docpile/storage"
 	"bitbucket.org/jonathanoliver/docpile/http"
-	"github.com/smartystreets/detour"
+	"bitbucket.org/jonathanoliver/docpile/storage"
 	"github.com/julienschmidt/httprouter"
+	"github.com/smartystreets/detour"
 
 	stdhttp "net/http"
 )
@@ -27,7 +27,7 @@ TODOs
 - during document search, as combinations of tags are specified,
     only the remaining intersection of tags is suggested
 
- */
+*/
 
 const workspacePath = "/Users/jonathan/Downloads/docpile"
 
