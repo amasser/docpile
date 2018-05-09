@@ -41,9 +41,9 @@ func main() {
 	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator, mutex)
 	handler = storage.NewLocalStorageHandler(handler, storage.NewLocalStorage(workspacePath))
 
-	tagController := http.NewTagController(handler)
-	assetController := http.NewAssetController(handler)
-	documentController := http.NewDocumentController(handler)
+	tagController := http.NewTagWriteController(handler)
+	assetController := http.NewAssetWriteController(handler)
+	documentController := http.NewDocumentWriteController(handler)
 
 	router := buildRouter()
 	router.Handler("PUT", "/tags", detour.New(tagController.Add))

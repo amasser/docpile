@@ -6,15 +6,15 @@ import (
 	"github.com/smartystreets/detour"
 )
 
-type DocumentController struct {
+type DocumentWriteController struct {
 	handler domain.Handler
 }
 
-func NewDocumentController(handler domain.Handler) *DocumentController {
-	return &DocumentController{handler: handler}
+func NewDocumentWriteController(handler domain.Handler) *DocumentWriteController {
+	return &DocumentWriteController{handler: handler}
 }
 
-func (this *DocumentController) Define(input *inputs.DefineDocument) detour.Renderer {
+func (this *DocumentWriteController) Define(input *inputs.DefineDocument) detour.Renderer {
 	if documentID, err := this.define(input); err == nil {
 		return newEntityResult(documentID)
 	} else if err == domain.AssetNotFoundError {
@@ -27,7 +27,7 @@ func (this *DocumentController) Define(input *inputs.DefineDocument) detour.Rend
 		return UnknownErrorResult
 	}
 }
-func (this *DocumentController) define(input *inputs.DefineDocument) (uint64, error) {
+func (this *DocumentWriteController) define(input *inputs.DefineDocument) (uint64, error) {
 	return this.handler.Handle(domain.DefineDocument{
 		Document: domain.DocumentDefinition{
 			AssetID:     input.AssetID,
