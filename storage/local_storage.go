@@ -12,15 +12,25 @@ type LocalStorage struct {
 }
 
 func NewLocalStorage(workspace string) *LocalStorage {
-	if len(workspace) == 0 {
+	this := &LocalStorage{workspace: workspace}
+	this.ensureWorkspace()
+	return this
+}
+func (this *LocalStorage) ensureWorkspace() {
+	if len(this.workspace) == 0 {
 		panic("workspace is required")
 	}
 
-	return &LocalStorage{workspace: workspace}
+	if err := os.MkdirAll(this.workspace, 0755); err != nil {
+		panic(err)
+	}
 }
-
-func (this *LocalStorage) EnsureWorkspace() error {
-	return os.MkdirAll(this.workspace, 0755)
+func (this *LocalStorage) composeFilename(key string) string {
+	key = strings.TrimSpace(key)
+	if len(key) == 0 {
+		panic("key is required")
+	}
+	return path.Join(this.workspace, key)
 }
 
 func (this *LocalStorage) Read(key string) (io.ReadCloser, error) {
@@ -48,24 +58,4 @@ func (this *LocalStorage) write(source io.ReadCloser, destination io.WriteCloser
 	var buffer [1024 * 16]byte
 	_, err := io.CopyBuffer(destination, source, buffer[:])
 	return err
-}
-
-func (this *LocalStorage) Move(old, new string) error {
-	old = this.composeFilename(old)
-	new = this.composeFilename(new)
-	if err := os.Rename(old, new); os.IsNotExist(err) {
-		return NotFoundError
-	} else if err != nil {
-		return err
-	} else {
-		return nil
-	}
-}
-
-func (this *LocalStorage) composeFilename(key string) string {
-	key = strings.TrimSpace(key)
-	if len(key) == 0 {
-		panic("key is required")
-	}
-	return path.Join(this.workspace, key)
 }

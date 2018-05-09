@@ -2,8 +2,8 @@ package domain
 
 import (
 	"fmt"
-	"reflect"
 	"log"
+	"reflect"
 )
 
 type MessageHandler struct {
