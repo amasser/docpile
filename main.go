@@ -36,12 +36,13 @@ func main() {
 	identity := domain.NewEpochGenerator()
 	aggregate := domain.NewAggregate(identity)
 
-	localWriter := storage.NewLocalStorage(workspacePath) // TODO: append on write
-	store := storage.NewTextEventStore(localWriter, events.InstanceRegistry)
+	store := storage.NewTextEventStore(
+		storage.NewLocalStorage(workspacePath).Append(),
+		events.InstanceRegistry)
 
+	// TODO: send to projections
 	for message := range store.Load() {
 		aggregate.Apply(message)
-		// TODO: send to projections
 	}
 
 	var applicator domain.Applicator = &Applicator{}

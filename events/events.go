@@ -2,6 +2,7 @@ package events
 
 import (
 	"log"
+	"reflect"
 	"time"
 )
 
@@ -60,10 +61,10 @@ type DocumentDefined struct {
 	Description string     `json:"description,omitempty"`
 }
 
-func InstanceRegistry(messageType string) interface{} {
+func InstanceRegistry(messageType string) reflect.Type {
 	switch messageType {
 	case "TagAdded":
-		return TagAdded{}
+		return reflect.TypeOf(TagAdded{})
 	default:
 		log.Fatalf("Unknown message type: [%s]\n", messageType)
 		return nil

@@ -13,10 +13,10 @@ import (
 type TextEventStore struct {
 	filename string
 	store    ReadWriter
-	registry func(string) interface{}
+	registry func(string) reflect.Type
 }
 
-func NewTextEventStore(store ReadWriter, registry func(string) interface{}) *TextEventStore {
+func NewTextEventStore(store ReadWriter, registry func(string) reflect.Type) *TextEventStore {
 	return &TextEventStore{
 		filename: defaultFilename,
 		store:    store,
@@ -64,22 +64,27 @@ func (this *TextEventStore) load(channel chan<- interface{}) {
 		if err := scanner.Err(); err != nil {
 			panic(err)
 		}
-
-		line := scanner.Bytes()
-		index := bytes.Index(line, []byte(fieldDelimiterBytes))
-		if index < 0 {
-			log.Panic(missingDelimiterError)
-		}
-
-		instance := this.registry(string(line[0:index]))
-		body := line[index:]
-		if err := json.Unmarshal(body, &instance); err != nil {
-			panic(err)
-		}
-		channel <- instance
+		channel <- this.parseLine(scanner.Bytes())
 	}
 
 	close(channel)
+}
+func (this *TextEventStore) parseLine(line []byte) interface{} {
+	index := bytes.Index(line, []byte(fieldDelimiterBytes))
+	if index < 0 {
+		log.Panic(missingDelimiterError)
+	}
+
+	messageType := string(line[0:index])
+	return this.deserialize(messageType, line[index:])
+}
+func (this *TextEventStore) deserialize(messageType string, body []byte) interface{} {
+	instance := reflect.New(this.registry(messageType))
+	if err := json.Unmarshal(body, instance.Interface()); err != nil {
+		panic(err)
+	}
+
+	return instance.Elem().Interface()
 }
 
 const (
@@ -88,5 +93,7 @@ const (
 	defaultFilename = "events.txt"
 )
 
-var fieldDelimiterBytes = []byte(fieldDelimiter)
-var missingDelimiterError = errors.New("missing field delimiter")
+var (
+	fieldDelimiterBytes   = []byte(fieldDelimiter)
+	missingDelimiterError = errors.New("missing field delimiter")
+)
