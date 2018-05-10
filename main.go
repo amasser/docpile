@@ -35,7 +35,7 @@ func main() {
 	aggregate := domain.NewAggregate(identity)
 
 	localWriter := storage.NewLocalStorage(workspacePath) // TODO: append on write
-	store := storage.NewCSVReader(localWriter)
+	store := storage.NewTextEventStore(localWriter)
 
 	var applicator domain.Applicator = &Applicator{}
 	applicator = domain.NewChannelApplicator(applicator).Start()
