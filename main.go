@@ -16,8 +16,6 @@ import (
 
 /*
 TODOs
-- loading of events from event storage at startup
-- routing of events to event storage and projections
 - projections
 - better/safer text encoding of event store OR disable advanced characters in input text fields, e.g. tags, description etc.
 
