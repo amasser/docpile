@@ -37,3 +37,8 @@ type (
 		Apply(...interface{})
 	}
 )
+
+type EventStore interface {
+	Store(...interface{}) error
+	Load() <-chan interface{}
+}

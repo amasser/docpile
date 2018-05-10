@@ -14,4 +14,9 @@ type Writer interface {
 	Write(string, io.ReadCloser) error
 }
 
+type ReadWriter interface {
+	Reader
+	Writer
+}
+
 var NotFoundError = os.ErrNotExist

@@ -34,10 +34,13 @@ func main() {
 	identity := domain.NewEpochGenerator()
 	aggregate := domain.NewAggregate(identity)
 
+	localWriter := storage.NewLocalStorage(workspacePath) // TODO: append on write
+	store := storage.NewCSVReader(localWriter)
+
 	var applicator domain.Applicator = &Applicator{}
 	applicator = domain.NewChannelApplicator(applicator).Start()
 
-	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator)
+	var handler domain.Handler = domain.NewMessageHandler(aggregate, store, applicator)
 	handler = domain.NewChannelHandler(handler).Start()
 	handler = storage.NewLocalStorageHandler(handler, storage.NewLocalStorage(workspacePath))
 
