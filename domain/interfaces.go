@@ -34,11 +34,11 @@ type (
 		Handle(interface{}) (uint64, error)
 	}
 	Applicator interface {
-		Apply(...interface{})
+		Apply([]interface{})
 	}
 )
 
 type EventStore interface {
-	Store(...interface{}) error
+	Store([]interface{}) error
 	Load() <-chan interface{}
 }

@@ -9,10 +9,10 @@ func NewEventStoreApplicator(inner Applicator, store EventStore) *EventStoreAppl
 	return &EventStoreApplicator{inner: inner, store: store}
 }
 
-func (this *EventStoreApplicator) Apply(messages ...interface{}) {
-	if err := this.store.Store(messages...); err != nil {
+func (this *EventStoreApplicator) Apply(messages []interface{}) {
+	if err := this.store.Store(messages); err != nil {
 		panic(err)
 	}
 
-	this.inner.Apply(messages...)
+	this.inner.Apply(messages)
 }

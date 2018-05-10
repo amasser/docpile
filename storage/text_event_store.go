@@ -19,14 +19,14 @@ func NewTextEventStore(store ReadWriter) *TextEventStore {
 	}
 }
 
-func (this *TextEventStore) Store(messages ...interface{}) error {
+func (this *TextEventStore) Store(messages []interface{}) error {
 	buffer := bytes.NewBuffer([]byte{})
 	writeToBuffer(buffer, messages)
 	return this.store.Write(this.filename, ioutil.NopCloser(buffer))
 }
 func writeToBuffer(buffer *bytes.Buffer, messages []interface{}) {
 	for _, message := range messages {
-		buffer.WriteString(reflect.TypeOf(message).String())
+		buffer.WriteString(reflect.TypeOf(message).Name())
 		buffer.WriteString("\t")
 		buffer.WriteString(serialize(message))
 		buffer.WriteString("\n")

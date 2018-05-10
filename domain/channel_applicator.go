@@ -19,10 +19,10 @@ func (this *ChannelApplicator) Start() *ChannelApplicator {
 
 func (this *ChannelApplicator) Listen() {
 	for messages := range this.channel {
-		this.inner.Apply(messages...)
+		this.inner.Apply(messages)
 	}
 }
 
-func (this *ChannelApplicator) Apply(messages ...interface{}) {
+func (this *ChannelApplicator) Apply(messages []interface{}) {
 	this.channel <- messages
 }

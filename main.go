@@ -18,6 +18,7 @@ TODOs
 - loading of events from event storage at startup
 - routing of events to event storage and projections
 - projections
+- better/safer text encoding of event store OR disable advanced characters in input text fields, e.g. tags, description etc.
 
 - tag "synonym" vs "alias" (which word is better)
 - apply/remove tags from documents
@@ -83,7 +84,7 @@ func buildRouter() *httprouter.Router {
 
 type Applicator struct{}
 
-func (this *Applicator) Apply(messages ...interface{}) {
+func (this *Applicator) Apply(messages []interface{}) {
 	for _, message := range messages {
 		log.Println("Applying:", message)
 	}
