@@ -8,11 +8,15 @@ import (
 )
 
 type LocalStorage struct {
-	workspace string
+	workspace  string
+	writeFlags int
 }
 
 func NewLocalStorage(workspace string) *LocalStorage {
-	this := &LocalStorage{workspace: workspace}
+	this := &LocalStorage{
+		workspace:  workspace,
+		writeFlags: os.O_CREATE | os.O_WRONLY,
+	}
 	this.ensureWorkspace()
 	return this
 }
@@ -32,6 +36,10 @@ func (this *LocalStorage) composeFilename(key string) string {
 	}
 	return path.Join(this.workspace, key)
 }
+func (this *LocalStorage) Append() *LocalStorage {
+	this.writeFlags |= os.O_APPEND
+	return this
+}
 
 func (this *LocalStorage) Read(key string) (io.ReadCloser, error) {
 	key = this.composeFilename(key)
@@ -46,7 +54,7 @@ func (this *LocalStorage) Read(key string) (io.ReadCloser, error) {
 
 func (this *LocalStorage) Write(key string, source io.ReadCloser) error {
 	key = this.composeFilename(key)
-	if handle, err := os.OpenFile(key, os.O_CREATE|os.O_WRONLY, 0644); err == nil {
+	if handle, err := os.OpenFile(key, this.writeFlags, 0644); err == nil {
 		return this.write(source, handle)
 	} else {
 		return err
