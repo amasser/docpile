@@ -8,23 +8,18 @@ import (
 
 type MessageHandler struct {
 	root       *Aggregate
-	store      EventStore
 	applicator Applicator
 }
 
-func NewMessageHandler(root *Aggregate, store EventStore, applicator Applicator) *MessageHandler {
-	return &MessageHandler{root: root, store: store, applicator: applicator}
+func NewMessageHandler(root *Aggregate, applicator Applicator) *MessageHandler {
+	return &MessageHandler{root: root, applicator: applicator}
 }
 
 func (this *MessageHandler) Handle(message interface{}) (uint64, error) {
 	if id, err := this.handle(message); err != nil {
 		return 0, err
-	} else if messages := this.root.Consume(); len(messages) == 0 {
-		return id, nil
-	} else if err = this.store.Store(messages); err != nil {
-		panic(err)
 	} else {
-		this.applicator.Apply(messages)
+		this.applicator.Apply(this.root.Consume())
 		return id, nil
 	}
 }

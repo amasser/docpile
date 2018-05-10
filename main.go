@@ -39,8 +39,9 @@ func main() {
 
 	var applicator domain.Applicator = &Applicator{}
 	applicator = domain.NewChannelApplicator(applicator).Start()
+	applicator = domain.NewEventStoreApplicator(applicator, store)
 
-	var handler domain.Handler = domain.NewMessageHandler(aggregate, store, applicator)
+	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator)
 	handler = domain.NewChannelHandler(handler).Start()
 	handler = storage.NewLocalStorageHandler(handler, storage.NewLocalStorage(workspacePath))
 
