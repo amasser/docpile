@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
+	"bitbucket.org/jonathanoliver/docpile/events"
 	"bitbucket.org/jonathanoliver/docpile/http"
 	"bitbucket.org/jonathanoliver/docpile/storage"
 	"github.com/julienschmidt/httprouter"
@@ -36,7 +37,12 @@ func main() {
 	aggregate := domain.NewAggregate(identity)
 
 	localWriter := storage.NewLocalStorage(workspacePath) // TODO: append on write
-	store := storage.NewTextEventStore(localWriter)
+	store := storage.NewTextEventStore(localWriter, events.InstanceRegistry)
+
+	for message := range store.Load() {
+		aggregate.Apply(message)
+		// TODO: send to projections
+	}
 
 	var applicator domain.Applicator = &Applicator{}
 	applicator = domain.NewChannelApplicator(applicator).Start()

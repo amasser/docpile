@@ -1,6 +1,7 @@
 package events
 
 import (
+	"log"
 	"time"
 )
 
@@ -57,4 +58,14 @@ type DocumentDefined struct {
 	Tags        []uint64   `json:"tags,omitempty"`
 	Documents   []uint64   `json:"documents,omitempty"`
 	Description string     `json:"description,omitempty"`
+}
+
+func InstanceRegistry(messageType string) interface{} {
+	switch messageType {
+	case "TagAdded":
+		return TagAdded{}
+	default:
+		log.Fatalf("Unknown message type: [%s]\n", messageType)
+		return nil
+	}
 }
