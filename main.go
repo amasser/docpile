@@ -45,6 +45,7 @@ func main() {
 	}
 
 	var applicator domain.Applicator = &Applicator{}
+	applicator = domain.NewMultiApplicator(applicator)
 	applicator = domain.NewChannelApplicator(applicator).Start()
 	applicator = domain.NewEventStoreApplicator(applicator, store)
 
