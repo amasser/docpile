@@ -16,17 +16,17 @@ func NewAssetWriteController(handler infrastructure.Handler) *AssetWriteControll
 }
 
 func (this *AssetWriteController) ImportManaged(input *inputs.ImportManagedAsset) detour.Renderer {
-	if assetID, err := this.importManaged(input); err == nil {
-		return newEntityResult(assetID)
-	} else if err == domain.AssetAlreadyExistsError {
+	if result := this.importManaged(input); result.Error == nil {
+		return newEntityResult(result.ID)
+	} else if result.Error == domain.AssetAlreadyExistsError {
 		return inputs.DuplicateAssetResult
-	} else if err == domain.StoreAssetError {
+	} else if result.Error == domain.StoreAssetError {
 		return UnknownErrorResult
 	} else {
 		return UnknownErrorResult
 	}
 }
-func (this *AssetWriteController) importManaged(input *inputs.ImportManagedAsset) (uint64, error) {
+func (this *AssetWriteController) importManaged(input *inputs.ImportManagedAsset) infrastructure.Result {
 	return this.handler.Handle(domain.ImportManagedStreamingAsset{
 		Name:     input.Name,
 		MIMEType: input.MIMEType,

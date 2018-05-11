@@ -1,8 +1,9 @@
 package domain
 
 import (
-	"bitbucket.org/jonathanoliver/docpile/events"
 	"io"
+
+	"bitbucket.org/jonathanoliver/docpile/events"
 )
 
 type AddTag struct {

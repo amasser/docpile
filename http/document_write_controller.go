@@ -16,19 +16,19 @@ func NewDocumentWriteController(handler infrastructure.Handler) *DocumentWriteCo
 }
 
 func (this *DocumentWriteController) Define(input *inputs.DefineDocument) detour.Renderer {
-	if documentID, err := this.define(input); err == nil {
-		return newEntityResult(documentID)
-	} else if err == domain.AssetNotFoundError {
+	if result := this.define(input); result.Error == nil {
+		return newEntityResult(result.ID)
+	} else if result.Error == domain.AssetNotFoundError {
 		return inputs.AssetDoesNotExistResult
-	} else if err == domain.TagNotFoundError {
+	} else if result.Error == domain.TagNotFoundError {
 		return inputs.TagDoesNotExistResult
-	} else if err == domain.DocumentNotFoundError {
+	} else if result.Error == domain.DocumentNotFoundError {
 		return inputs.DocumentDoesNotExistResult
 	} else {
 		return UnknownErrorResult
 	}
 }
-func (this *DocumentWriteController) define(input *inputs.DefineDocument) (uint64, error) {
+func (this *DocumentWriteController) define(input *inputs.DefineDocument) infrastructure.Result {
 	return this.handler.Handle(domain.DefineDocument{
 		Document: domain.DocumentDefinition{
 			AssetID:     input.AssetID,

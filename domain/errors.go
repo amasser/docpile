@@ -1,9 +1,6 @@
 package domain
 
-import (
-	"errors"
-	"time"
-)
+import "errors"
 
 var (
 	TagAlreadyExistsError   = errors.New("tag already exists")
@@ -13,14 +10,3 @@ var (
 	DocumentNotFoundError   = errors.New("document not found")
 	StoreAssetError         = errors.New("unable to storage asset")
 )
-
-type DocumentDefinition struct {
-	AssetID     uint64
-	AssetOffset uint64
-	Published   *time.Time
-	PeriodBegin *time.Time
-	PeriodEnd   *time.Time
-	Tags        []uint64
-	Documents   []uint64
-	Description string
-}

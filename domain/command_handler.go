@@ -17,15 +17,15 @@ func NewCommandHandler(root *Aggregate, applicator infrastructure.Applicator) *C
 	return &CommandHandler{root: root, applicator: applicator}
 }
 
-func (this *CommandHandler) Handle(message interface{}) (uint64, error) {
-	if id, err := this.handle(message); err != nil {
-		return 0, err
-	} else {
+func (this *CommandHandler) Handle(message interface{}) infrastructure.Result {
+	result := this.handle(message)
+	if result.Error == nil {
 		this.applicator.Apply(this.root.Consume())
-		return id, nil
 	}
+
+	return result
 }
-func (this *CommandHandler) handle(message interface{}) (uint64, error) {
+func (this *CommandHandler) handle(message interface{}) infrastructure.Result {
 	switch message := message.(type) {
 
 	case AddTag:
@@ -47,7 +47,6 @@ func (this *CommandHandler) handle(message interface{}) (uint64, error) {
 
 	default:
 		log.Panicf(fmt.Sprintf("CommandHandler cannot handle '%s'", reflect.TypeOf(message)))
+		return newResult(0, nil)
 	}
-
-	return 0, nil
 }

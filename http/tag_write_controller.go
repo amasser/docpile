@@ -30,13 +30,13 @@ func (this *TagWriteController) RemoveSynonym(input *inputs.RemoveTagSynonym) de
 }
 
 func (this *TagWriteController) renderTagResult(message interface{}) detour.Renderer {
-	if id, err := this.handler.Handle(message); id == 0 && err == nil {
+	if result := this.handler.Handle(message); result.ID == 0 && result.Error == nil {
 		return nil
-	} else if id > 0 && err == nil {
-		return newEntityResult(id)
-	} else if err == domain.TagAlreadyExistsError {
+	} else if result.ID > 0 && result.Error == nil {
+		return newEntityResult(result.ID)
+	} else if result.Error == domain.TagAlreadyExistsError {
 		return inputs.DuplicateTagResult
-	} else if err == domain.TagNotFoundError {
+	} else if result.Error == domain.TagNotFoundError {
 		return inputs.TagNotFoundResult
 	} else {
 		return UnknownErrorResult

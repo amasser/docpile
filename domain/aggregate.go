@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"bitbucket.org/jonathanoliver/docpile/events"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure"
 	"bitbucket.org/jonathanoliver/docpile/infrastructure/identity"
 	"github.com/smartystreets/clock"
 )
@@ -36,72 +37,72 @@ func NewAggregate(identity identity.Generator) *Aggregate {
 	}
 }
 
-func (this *Aggregate) AddTag(name string) (uint64, error) {
+func (this *Aggregate) AddTag(name string) infrastructure.Result {
 	if id, contains := this.tagsByNormalizedName[normalizeTag(name)]; contains {
-		return id, TagAlreadyExistsError
+		return newResult(id, TagAlreadyExistsError)
 	}
 
 	id := this.identity.Next()
-	return id, this.raise(events.TagAdded{
+	return this.raise(id, events.TagAdded{
 		TagID:     id,
 		Timestamp: this.clock.UTCNow(),
 		TagName:   name,
 	})
 }
-func (this *Aggregate) RenameTag(id uint64, name string) (uint64, error) {
-	if id, err := this.validTagInput(id, name); err != nil {
-		return id, err
+func (this *Aggregate) RenameTag(id uint64, name string) infrastructure.Result {
+	if result := this.validTagInput(id, name); result.Error != nil {
+		return result
 	}
 
-	return id, this.raise(events.TagRenamed{
+	return this.raise(id, events.TagRenamed{
 		TagID:     id,
 		Timestamp: this.clock.UTCNow(),
 		OldName:   this.tagsByID[id],
 		NewName:   name,
 	})
 }
-func (this *Aggregate) DefineTagSynonym(id uint64, name string) (uint64, error) {
-	if id, err := this.validTagInput(id, name); err != nil {
-		return id, err
+func (this *Aggregate) DefineTagSynonym(id uint64, name string) infrastructure.Result {
+	if result := this.validTagInput(id, name); result.Error != nil {
+		return result
 	}
 
-	return id, this.raise(events.TagSynonymDefined{
+	return this.raise(id, events.TagSynonymDefined{
 		TagID:     id,
 		Timestamp: this.clock.UTCNow(),
 		TagName:   name,
 	})
 }
-func (this *Aggregate) RemoveTagSynonym(id uint64, name string) (uint64, error) {
-	if id, err := this.validTagInput(id, name); err != nil {
-		return id, err
+func (this *Aggregate) RemoveTagSynonym(id uint64, name string) infrastructure.Result {
+	if result := this.validTagInput(id, name); result.Error != nil {
+		return result
 	}
 
-	return id, this.raise(events.TagSynonymRemoved{
+	return this.raise(id, events.TagSynonymRemoved{
 		TagID:     id,
 		Timestamp: this.clock.UTCNow(),
 		TagName:   name,
 	})
 }
-func (this *Aggregate) validTagInput(id uint64, name string) (uint64, error) {
+func (this *Aggregate) validTagInput(id uint64, name string) infrastructure.Result {
 	if _, contains := this.tagsByID[id]; !contains {
-		return 0, TagNotFoundError
+		return newResult(0, TagNotFoundError)
 	} else if id, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
-		return id, TagAlreadyExistsError
+		return newResult(id, TagAlreadyExistsError)
 	} else {
-		return id, nil
+		return newResult(id, nil)
 	}
 }
 func normalizeTag(value string) string {
 	return strings.ToLower(value)
 }
 
-func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256Hash) (uint64, error) {
+func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256Hash) infrastructure.Result {
 	if id, contains := this.managedAssets[hash]; contains {
-		return id, AssetAlreadyExistsError
+		return newResult(id, AssetAlreadyExistsError)
 	}
 
 	id := this.identity.Next()
-	return id, this.raise(events.ManagedAssetImported{
+	return this.raise(id, events.ManagedAssetImported{
 		AssetID:   id,
 		Timestamp: this.clock.UTCNow(),
 		Hash:      events.SHA256Hash(hash),
@@ -110,13 +111,13 @@ func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256H
 		Key:       fmt.Sprintf("%d%s", id, path.Ext(name)),
 	})
 }
-func (this *Aggregate) ImportCloudAsset(name, provider, resource string) (uint64, error) {
+func (this *Aggregate) ImportCloudAsset(name, provider, resource string) infrastructure.Result {
 	if _, contains := this.cloudAssets[normalizeCloudAsset(provider, resource)]; contains {
-		return 0, AssetAlreadyExistsError
+		return newResult(0, AssetAlreadyExistsError)
 	}
 
 	id := this.identity.Next()
-	return id, this.raise(events.CloudAssetImported{
+	return this.raise(id, events.CloudAssetImported{
 		AssetID:   id,
 		Timestamp: this.clock.UTCNow(),
 		Name:      name,
@@ -128,13 +129,13 @@ func normalizeCloudAsset(provider, resource string) string {
 	return fmt.Sprintf("%s.%s", strings.ToLower(provider), resource)
 }
 
-func (this *Aggregate) DefineDocument(doc DocumentDefinition) (uint64, error) {
+func (this *Aggregate) DefineDocument(doc DocumentDefinition) infrastructure.Result {
 	if err := this.validDefinition(doc); err != nil {
-		return 0, err
+		return newResult(0, err)
 	}
 
 	id := this.identity.Next()
-	return id, this.raise(events.DocumentDefined{
+	return this.raise(id, events.DocumentDefined{
 		DocumentID:  id,
 		Timestamp:   this.clock.UTCNow(),
 		AssetID:     doc.AssetID,
@@ -168,10 +169,10 @@ func (this *Aggregate) validDefinition(doc DocumentDefinition) error {
 	return nil
 }
 
-func (this *Aggregate) raise(event interface{}) error {
+func (this *Aggregate) raise(id uint64, event interface{}) infrastructure.Result {
 	this.apply(event)
 	this.events = append(this.events, event)
-	return nil
+	return newResult(id, nil)
 }
 
 func (this *Aggregate) Apply(messages ...interface{}) {

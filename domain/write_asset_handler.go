@@ -22,7 +22,7 @@ func NewWriteAssetHandler(inner infrastructure.Handler, writer storage.Writer) *
 	return &WriteAssetHandler{inner: inner, writer: writer}
 }
 
-func (this *WriteAssetHandler) Handle(message interface{}) (uint64, error) {
+func (this *WriteAssetHandler) Handle(message interface{}) infrastructure.Result {
 	switch message := message.(type) {
 	case ImportManagedStreamingAsset:
 		return this.handle(message)
@@ -30,25 +30,25 @@ func (this *WriteAssetHandler) Handle(message interface{}) (uint64, error) {
 		return this.inner.Handle(message)
 	}
 }
-func (this *WriteAssetHandler) handle(message ImportManagedStreamingAsset) (uint64, error) {
+func (this *WriteAssetHandler) handle(message ImportManagedStreamingAsset) infrastructure.Result {
 	buffer, err := bufferStream(message.Size, message.Body)
 	if err != nil {
-		return 0, err
+		return newResult(0, err)
 	}
 
-	id, err := this.sendMessage(message.Name, message.MIMEType, buffer)
-	if err != nil {
-		return 0, err
+	result := this.sendMessage(message.Name, message.MIMEType, buffer)
+	if result.Error != nil {
+		return result
 	}
 
-	if err := this.writeBuffer(id, message.Name, buffer); err != nil {
+	if err := this.writeBuffer(result.ID, message.Name, buffer); err != nil {
 		panic(err) // because we don't have a compensating event, we panic so the event never happens
 	}
 
-	return id, nil
+	return result
 }
 
-func (this *WriteAssetHandler) sendMessage(name, mime string, buffer *bytes.Buffer) (uint64, error) {
+func (this *WriteAssetHandler) sendMessage(name, mime string, buffer *bytes.Buffer) infrastructure.Result {
 	return this.inner.Handle(ImportManagedAsset{
 		Name:     name,
 		MIMEType: mime,
