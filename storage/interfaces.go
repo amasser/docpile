@@ -5,13 +5,6 @@ import (
 	"os"
 )
 
-type Serializer interface {
-	Serialize(interface{}, io.Writer) error
-	Deserialize(io.Reader, interface{}) error
-}
-
-/////////////////////////////////////////////////////
-
 type Reader interface {
 	Read(string) (io.ReadCloser, error)
 }
@@ -27,5 +20,3 @@ type ReadWriter interface {
 }
 
 var NotFoundError = os.ErrNotExist
-
-/////////////////////////////////////////////////////

@@ -8,9 +8,9 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/events"
 	"bitbucket.org/jonathanoliver/docpile/http"
+	"bitbucket.org/jonathanoliver/docpile/serialization"
 	"bitbucket.org/jonathanoliver/docpile/storage/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/storage/local"
-	"bitbucket.org/jonathanoliver/docpile/storage/serialization"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
 )
@@ -35,7 +35,7 @@ func main() {
 	store := eventstore.New(
 		local.New(workspacePath).Append(),
 		events.MessageRegistry,
-		serialization.New())
+		serialization.JSON())
 
 	aggregate := domain.NewAggregate(domain.NewEpochGenerator())
 	for message := range store.Load() {

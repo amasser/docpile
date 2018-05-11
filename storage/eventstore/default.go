@@ -9,6 +9,7 @@ import (
 	"log"
 	"reflect"
 
+	"bitbucket.org/jonathanoliver/docpile/serialization"
 	"bitbucket.org/jonathanoliver/docpile/storage"
 )
 
@@ -16,10 +17,10 @@ type Default struct {
 	filename   string
 	store      storage.ReadWriter
 	registry   Registry
-	serializer storage.Serializer
+	serializer serialization.Serializer
 }
 
-func New(store storage.ReadWriter, registry Registry, serializer storage.Serializer) *Default {
+func New(store storage.ReadWriter, registry Registry, serializer serialization.Serializer) *Default {
 	return &Default{
 		filename:   defaultFilename,
 		store:      store,
