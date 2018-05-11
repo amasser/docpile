@@ -19,10 +19,9 @@ TODOs
     only the remaining intersection of tags is suggested
 */
 
-const workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
-
 func main() {
-	wireup := NewWireup(workspacePath)
+	const workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
+	wireup := NewWireup(workspacePath, workspacePath)
 
 	aggregate := wireup.BuildDomain()
 	store := wireup.BuildEventStore(aggregate)
@@ -31,8 +30,7 @@ func main() {
 		aggregate.Apply(message)
 	}
 
-	applicator := wireup.BuildApplicator(store)
-	application := wireup.BuildMessageHandler(aggregate, applicator)
+	application := wireup.BuildMessageHandler(aggregate, store)
 	httpHandler := wireup.BuildHTTPHandler(application)
 
 	fmt.Println("Listening...")

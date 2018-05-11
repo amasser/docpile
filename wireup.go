@@ -17,11 +17,12 @@ import (
 )
 
 type Wireup struct {
-	workspace string
+	indexPath string
+	dataPath  string
 }
 
-func NewWireup(workspace string) *Wireup {
-	return &Wireup{workspace: workspace}
+func NewWireup(indexPath string, dataPath string) *Wireup {
+	return &Wireup{indexPath: indexPath, dataPath: dataPath}
 }
 
 func (this *Wireup) BuildDomain() *domain.Aggregate {
@@ -30,7 +31,7 @@ func (this *Wireup) BuildDomain() *domain.Aggregate {
 
 func (this *Wireup) BuildEventStore(aggregate handlers.Aggregate) *eventstore.DelimitedText {
 	return eventstore.NewDelimitedText(
-		storage.NewFileStorage(workspacePath, storage.Append(), storage.EnsureWorkspace()),
+		storage.NewFileStorage(this.indexPath, storage.Append(), storage.EnsureWorkspace()),
 		this.buildTypeRegistry(),
 		serialization.NewJSONSerializer())
 }
@@ -48,17 +49,18 @@ func (this *Wireup) buildTypeRegistry() eventstore.TypeRegistry {
 	return registry
 }
 
-func (this *Wireup) BuildApplicator(store eventstore.EventStore) applicators.Applicator {
+func (this *Wireup) BuildMessageHandler(aggregate handlers.Aggregate, store eventstore.EventStore) handlers.Handler {
+	var applicator = this.buildApplicator(store)
+
+	var application handlers.Handler = handlers.NewDomain(aggregate, applicator)
+	application = handlers.NewChannel(application, handlers.StartChannel())
+	application = domain.NewWriteAssetHandler(application, storage.NewFileStorage(this.dataPath))
+	return application
+}
+func (this *Wireup) buildApplicator(store eventstore.EventStore) applicators.Applicator {
 	applicator := SampleApplicator()
 	applicator = eventstore.NewApplicator(applicator, store)
 	return applicator
-}
-
-func (this *Wireup) BuildMessageHandler(aggregate handlers.Aggregate, applicator applicators.Applicator) handlers.Handler {
-	var application handlers.Handler = handlers.NewDomain(aggregate, applicator)
-	application = handlers.NewChannel(application, handlers.StartChannel())
-	application = domain.NewWriteAssetHandler(application, storage.NewFileStorage(this.workspace))
-	return application
 }
 
 func (this *Wireup) BuildHTTPHandler(application handlers.Handler) stdhttp.Handler {
