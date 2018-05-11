@@ -61,12 +61,28 @@ type DocumentDefined struct {
 	Description string     `json:"description,omitempty"`
 }
 
-func InstanceRegistry(messageType string) reflect.Type {
-	switch messageType {
-	case "TagAdded":
-		return reflect.TypeOf(TagAdded{})
-	default:
-		log.Fatalf("Unknown message type: [%s]\n", messageType)
+///////////////////////////////////////////////////////////
+
+func init() {
+	registerType("tag-added", TagAdded{})
+	registerType("tag-removed", TagRenamed{})
+	registerType("tag-synonym-defined", TagSynonymDefined{})
+	registerType("tag-synonym-removed", TagSynonymRemoved{})
+	registerType("managed-asset-imported", ManagedAssetImported{})
+	registerType("cloud-asset-imported", CloudAssetImported{})
+	registerType("document-defined", DocumentDefined{})
+}
+func registerType(name string, instance interface{}) {
+	instanceType := reflect.TypeOf(instance)
+	registry[instanceType.Name()] = instanceType
+}
+func InstanceRegistry(name string) reflect.Type {
+	if registeredType, contains := registry[name]; contains {
+		return registeredType
+	} else {
+		log.Fatalf("Unknown message type: [%s]\n", name)
 		return nil
 	}
 }
+
+var registry = map[string]reflect.Type{}

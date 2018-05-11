@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	stdhttp "net/http"
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/events"
@@ -10,8 +11,6 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/storage"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
-
-	stdhttp "net/http"
 )
 
 /*
