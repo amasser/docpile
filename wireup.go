@@ -49,7 +49,7 @@ func (this *Wireup) buildTypeRegistry() eventstore.TypeRegistry {
 }
 
 func (this *Wireup) BuildApplicator(store eventstore.EventStore) applicators.Applicator {
-	applicator := SampleAplicator()
+	applicator := SampleApplicator()
 	applicator = eventstore.NewApplicator(applicator, store)
 	return applicator
 }

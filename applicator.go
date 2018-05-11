@@ -8,7 +8,7 @@ import (
 
 type Applicator struct{}
 
-func SampleAplicator() applicators.Applicator {
+func SampleApplicator() applicators.Applicator {
 	return &Applicator{}
 }
 
