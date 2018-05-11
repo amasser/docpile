@@ -30,13 +30,12 @@ TODOs
 const workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
 
 func main() {
-	identity := domain.NewEpochGenerator()
-	aggregate := domain.NewAggregate(identity)
-
 	store := storage.NewTextEventStore(
-		storage.NewLocalStorage(workspacePath).Append(), events.MessageRegistry)
+		storage.NewLocalStorage(workspacePath).Append(),
+		events.MessageRegistry,
+		storage.NewJSONSerializer())
 
-	// TODO: send to projections
+	aggregate := domain.NewAggregate(domain.NewEpochGenerator())
 	for message := range store.Load() {
 		aggregate.Apply(message)
 	}

@@ -11,42 +11,40 @@ import (
 )
 
 type TextEventStore struct {
-	filename string
-	store    ReadWriter
-	registry Registry
+	filename   string
+	store      ReadWriter
+	registry   Registry
+	serializer Serializer
 }
 
-func NewTextEventStore(store ReadWriter, registry Registry) *TextEventStore {
+func NewTextEventStore(store ReadWriter, registry Registry, serializer Serializer) *TextEventStore {
 	return &TextEventStore{
-		filename: defaultFilename,
-		store:    store,
-		registry: registry,
+		filename:   defaultFilename,
+		store:      store,
+		registry:   registry,
+		serializer: serializer,
 	}
 }
 
 func (this *TextEventStore) Store(messages []interface{}) error {
 	buffer := bytes.NewBuffer([]byte{})
-	this.writeToBuffer(buffer, messages)
+	this.writeMessagesToBuffer(messages, buffer)
 	return this.store.Write(this.filename, ioutil.NopCloser(buffer))
 }
-func (this *TextEventStore) writeToBuffer(buffer *bytes.Buffer, messages []interface{}) {
+func (this *TextEventStore) writeMessagesToBuffer(messages []interface{}, destination *bytes.Buffer) {
 	for _, message := range messages {
-		buffer.WriteString(this.typeName(message))
-		buffer.WriteString(fieldDelimiter)
-		buffer.WriteString(serialize(message))
-		buffer.WriteString(lineBreak)
+		this.writeMessageToBuffer(message, destination)
 	}
+}
+func (this *TextEventStore) writeMessageToBuffer(message interface{}, destination *bytes.Buffer) {
+	destination.WriteString(this.typeName(message))
+	destination.WriteString(fieldDelimiter)
+	this.serializer.Serialize(message, destination)
+	destination.WriteString(lineBreak)
 }
 func (this *TextEventStore) typeName(message interface{}) string {
 	if typeName, err := this.registry.Name(reflect.TypeOf(message)); err == nil {
 		return typeName
-	} else {
-		panic(err)
-	}
-}
-func serialize(message interface{}) string {
-	if serialized, err := json.Marshal(message); err == nil {
-		return string(serialized)
 	} else {
 		panic(err)
 	}

@@ -26,3 +26,8 @@ type Registry interface {
 	Name(reflect.Type) (string, error)
 	Type(string) (reflect.Type, error)
 }
+
+type Serializer interface {
+	Serialize(interface{}, io.Writer) error
+	Deserialize(io.Reader, interface{}) error
+}
