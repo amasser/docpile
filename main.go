@@ -9,10 +9,7 @@ import (
 TODOs
 - projections
 - better/safer text encoding of event store OR disable advanced characters in input text fields, e.g. tags, description etc.
-
-- tag "synonym" vs "alias" (which word is better)
 - apply/remove tags from documents
-
 - document search
 - tag search (finding tags that match partial text)
 - during document search, as combinations of tags are specified,

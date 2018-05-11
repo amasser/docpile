@@ -16,12 +16,12 @@ type TagRenamed struct {
 type TagSynonymDefined struct {
 	TagID     uint64    `json:"tag_id"`
 	Timestamp time.Time `json:"timestamp"`
-	TagName   string    `json:"tag_name"`
+	TagName   string    `json:"tag_name"` // TODO: rename field?
 }
 type TagSynonymRemoved struct {
 	TagID     uint64    `json:"tag_id"`
 	Timestamp time.Time `json:"timestamp"`
-	TagName   string    `json:"tag_name"`
+	TagName   string    `json:"tag_name"` // TODO: rename field?
 }
 
 type ManagedAssetImported struct {
