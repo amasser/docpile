@@ -1,13 +1,16 @@
 package handlers
 
-import "bitbucket.org/jonathanoliver/docpile/generic"
+import (
+	"bitbucket.org/jonathanoliver/docpile/generic"
+	"bitbucket.org/jonathanoliver/docpile/generic/applicators"
+)
 
 type DomainHandler struct {
 	aggregate  generic.Aggregate
-	applicator generic.Applicator
+	applicator applicators.Applicator
 }
 
-func NewDomainHandler(aggregate generic.Aggregate, applicator generic.Applicator) *DomainHandler {
+func NewDomainHandler(aggregate generic.Aggregate, applicator applicators.Applicator) *DomainHandler {
 	return &DomainHandler{aggregate: aggregate, applicator: applicator}
 }
 

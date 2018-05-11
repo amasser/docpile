@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/app/events"
 	"bitbucket.org/jonathanoliver/docpile/app/http"
 	"bitbucket.org/jonathanoliver/docpile/generic"
+	"bitbucket.org/jonathanoliver/docpile/generic/applicators"
 	"bitbucket.org/jonathanoliver/docpile/generic/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
 	"bitbucket.org/jonathanoliver/docpile/generic/identity"
@@ -54,7 +55,7 @@ func main() {
 		aggregate.Apply(message)
 	}
 
-	var applicator generic.Applicator = &Applicator{}
+	var applicator applicators.Applicator = &Applicator{}
 	applicator = eventstore.NewApplicator(applicator, store)
 
 	var handler generic.Handler = handlers.NewDomainHandler(aggregate, applicator)
