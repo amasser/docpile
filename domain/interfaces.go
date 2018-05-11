@@ -5,10 +5,6 @@ import (
 	"time"
 )
 
-type IdentityGenerator interface {
-	Next() uint64
-}
-
 var (
 	TagAlreadyExistsError   = errors.New("tag already exists")
 	AssetAlreadyExistsError = errors.New("asset already exists")
@@ -27,18 +23,4 @@ type DocumentDefinition struct {
 	Tags        []uint64
 	Documents   []uint64
 	Description string
-}
-
-type (
-	Handler interface {
-		Handle(interface{}) (uint64, error)
-	}
-	Applicator interface {
-		Apply([]interface{})
-	}
-)
-
-type EventStore interface {
-	Store([]interface{}) error
-	Load() <-chan interface{}
 }

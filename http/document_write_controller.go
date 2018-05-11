@@ -3,14 +3,15 @@ package http
 import (
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/http/inputs"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure"
 	"github.com/smartystreets/detour"
 )
 
 type DocumentWriteController struct {
-	handler domain.Handler
+	handler infrastructure.Handler
 }
 
-func NewDocumentWriteController(handler domain.Handler) *DocumentWriteController {
+func NewDocumentWriteController(handler infrastructure.Handler) *DocumentWriteController {
 	return &DocumentWriteController{handler: handler}
 }
 

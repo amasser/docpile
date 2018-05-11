@@ -9,15 +9,16 @@ import (
 	"path"
 
 	"bitbucket.org/jonathanoliver/docpile/events"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure"
 	"bitbucket.org/jonathanoliver/docpile/infrastructure/storage"
 )
 
 type WriteAssetHandler struct {
-	inner  Handler
+	inner  infrastructure.Handler
 	writer storage.Writer
 }
 
-func NewWriteAssetHandler(inner Handler, writer storage.Writer) *WriteAssetHandler {
+func NewWriteAssetHandler(inner infrastructure.Handler, writer storage.Writer) *WriteAssetHandler {
 	return &WriteAssetHandler{inner: inner, writer: writer}
 }
 

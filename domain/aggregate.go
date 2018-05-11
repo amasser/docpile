@@ -8,13 +8,14 @@ import (
 	"strings"
 
 	"bitbucket.org/jonathanoliver/docpile/events"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure/identity"
 	"github.com/smartystreets/clock"
 )
 
 type Aggregate struct {
 	events               []interface{}
 	clock                *clock.Clock
-	identity             IdentityGenerator
+	identity             identity.Generator
 	tagsByID             map[uint64]string
 	tagsByNormalizedName map[string]uint64
 	assetsByID           map[uint64]struct{}
@@ -23,7 +24,7 @@ type Aggregate struct {
 	documentsByID        map[uint64]struct{}
 }
 
-func NewAggregate(identity IdentityGenerator) *Aggregate {
+func NewAggregate(identity identity.Generator) *Aggregate {
 	return &Aggregate{
 		identity:             identity,
 		tagsByID:             make(map[uint64]string),

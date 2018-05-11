@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+
+	"bitbucket.org/jonathanoliver/docpile/infrastructure"
 )
 
 type MessageHandler struct {
 	root       *Aggregate
-	applicator Applicator
+	applicator infrastructure.Applicator
 }
 
-func NewMessageHandler(root *Aggregate, applicator Applicator) *MessageHandler {
+func NewMessageHandler(root *Aggregate, applicator infrastructure.Applicator) *MessageHandler {
 	return &MessageHandler{root: root, applicator: applicator}
 }
 
