@@ -1,8 +1,6 @@
 package domain
 
-import (
-	"bitbucket.org/jonathanoliver/docpile/infrastructure"
-)
+import "bitbucket.org/jonathanoliver/docpile/infrastructure"
 
 type Handler struct {
 	aggregate  infrastructure.Aggregate
@@ -15,9 +13,6 @@ func NewHandler(aggregate infrastructure.Aggregate, applicator infrastructure.Ap
 
 func (this *Handler) Handle(message interface{}) infrastructure.Result {
 	result := this.aggregate.Handle(message)
-	if result.Error == nil {
-		this.applicator.Apply(this.aggregate.Consume())
-	}
-
+	this.applicator.Apply(this.aggregate.Consume())
 	return result
 }
