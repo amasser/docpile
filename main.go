@@ -7,10 +7,10 @@ import (
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/events"
-	"bitbucket.org/jonathanoliver/docpile/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/http"
-	"bitbucket.org/jonathanoliver/docpile/serialization"
-	"bitbucket.org/jonathanoliver/docpile/storage"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure/eventstore"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure/serialization"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure/storage"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
 )

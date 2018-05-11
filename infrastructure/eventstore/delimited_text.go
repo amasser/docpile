@@ -9,8 +9,8 @@ import (
 	"log"
 	"reflect"
 
-	"bitbucket.org/jonathanoliver/docpile/serialization"
-	"bitbucket.org/jonathanoliver/docpile/storage"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure/serialization"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure/storage"
 )
 
 type DelimitedText struct {

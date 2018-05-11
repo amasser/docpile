@@ -9,7 +9,7 @@ import (
 	"path"
 
 	"bitbucket.org/jonathanoliver/docpile/events"
-	"bitbucket.org/jonathanoliver/docpile/storage"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure/storage"
 )
 
 type WriteAssetHandler struct {
