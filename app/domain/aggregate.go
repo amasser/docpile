@@ -202,7 +202,7 @@ func (this *Aggregate) raise(id uint64, event interface{}) handlers.Result {
 	return newResult(id, nil)
 }
 
-func (this *Aggregate) Apply(messages ...interface{}) {
+func (this *Aggregate) Apply(messages []interface{}) {
 	for _, message := range messages {
 		this.apply(message)
 	}

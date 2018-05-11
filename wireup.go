@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/app/domain"
 	"bitbucket.org/jonathanoliver/docpile/app/events"
 	"bitbucket.org/jonathanoliver/docpile/app/http"
+	"bitbucket.org/jonathanoliver/docpile/app/projections"
 	"bitbucket.org/jonathanoliver/docpile/generic/applicators"
 	"bitbucket.org/jonathanoliver/docpile/generic/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
@@ -43,25 +44,30 @@ func (this *Wireup) buildTypeRegistry() eventstore.TypeRegistry {
 	return registry
 }
 
-func (this *Wireup) BuildMessageHandler(aggregate handlers.Aggregate, store eventstore.EventStore) handlers.Handler {
-	var applicator = this.buildApplicator(store)
+func (this *Wireup) BuildProjector() *projections.Projector {
+	return projections.NewProjector()
+}
+
+func (this *Wireup) BuildMessageHandler(aggregate handlers.Aggregate, store eventstore.EventStore, projector *projections.Projector) handlers.Handler {
+	var applicator = this.buildApplicator(store, projector)
 
 	var application handlers.Handler = handlers.NewDomain(aggregate, applicator)
 	application = handlers.NewChannel(application, handlers.StartChannel())
 	application = domain.NewWriteAssetHandler(application, storage.NewFileStorage(this.dataPath))
 	return application
 }
-func (this *Wireup) buildApplicator(store eventstore.EventStore) applicators.Applicator {
+func (this *Wireup) buildApplicator(store eventstore.EventStore, projector *projections.Projector) applicators.Applicator {
 	applicator := SampleApplicator()
-	applicator = applicators.NewFanout(applicator)
+	applicator = applicators.NewFanout(applicator, projector)
 	applicator = applicators.NewMutex(applicator, this.mutex)
 	applicator = applicators.NewChannel(applicator, applicators.StartChannel())
 	applicator = eventstore.NewApplicator(applicator, store)
 	return applicator
 }
 
-func (this *Wireup) BuildHTTPHandler(application handlers.Handler) stdhttp.Handler {
+func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *projections.Projector) stdhttp.Handler {
 	tagWriter := http.NewTagWriter(application)
+	tagReader := http.NewTagReader(projector)
 	assetWriter := http.NewAssetWriter(application)
 	documentWriter := http.NewDocumentWriter(application)
 
@@ -75,6 +81,7 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler) stdhttp.Handl
 	router.Handler("PUT", "/documents", detour.New(documentWriter.Define))
 
 	// TODO: protect reads with this.mutex.RLocker()
+	router.Handler("GET", "/tags", detour.New(tagReader.List))
 
 	return router
 

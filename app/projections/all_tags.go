@@ -14,12 +14,7 @@ func NewAllTags() *AllTags {
 	return &AllTags{}
 }
 
-func (this *AllTags) Apply(messages []interface{}) {
-	for _, message := range messages {
-		this.apply(message)
-	}
-}
-func (this *AllTags) apply(message interface{}) {
+func (this *AllTags) Transform(message interface{}) {
 	switch message := message.(type) {
 	case events.TagAdded:
 		this.tagAdded(message)

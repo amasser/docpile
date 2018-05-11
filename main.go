@@ -22,13 +22,15 @@ func main() {
 
 	aggregate := wireup.BuildDomain()
 	store := wireup.BuildEventStore(aggregate)
+	projector := wireup.BuildProjector()
 
 	for message := range store.Load() {
-		aggregate.Apply(message)
+		aggregate.Apply([]interface{}{message})
+		projector.Apply([]interface{}{message})
 	}
 
-	application := wireup.BuildMessageHandler(aggregate, store)
-	httpHandler := wireup.BuildHTTPHandler(application)
+	application := wireup.BuildMessageHandler(aggregate, store, projector)
+	httpHandler := wireup.BuildHTTPHandler(application, projector)
 
 	fmt.Println("Listening...")
 	http.ListenAndServe("127.0.0.1:8080", httpHandler)
