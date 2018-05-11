@@ -2,6 +2,7 @@ package domain
 
 import (
 	"io"
+	"time"
 
 	"bitbucket.org/jonathanoliver/docpile/events"
 )
@@ -42,4 +43,15 @@ type ImportCloudAsset struct {
 
 type DefineDocument struct {
 	Document DocumentDefinition
+}
+
+type DocumentDefinition struct {
+	AssetID     uint64
+	AssetOffset uint64
+	Published   *time.Time
+	PeriodBegin *time.Time
+	PeriodEnd   *time.Time
+	Tags        []uint64
+	Documents   []uint64
+	Description string
 }
