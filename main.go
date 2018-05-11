@@ -10,6 +10,7 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/http"
 	"bitbucket.org/jonathanoliver/docpile/infrastructure"
 	"bitbucket.org/jonathanoliver/docpile/infrastructure/eventstore"
+	"bitbucket.org/jonathanoliver/docpile/infrastructure/handlers"
 	"bitbucket.org/jonathanoliver/docpile/infrastructure/identity"
 	"bitbucket.org/jonathanoliver/docpile/infrastructure/serialization"
 	"bitbucket.org/jonathanoliver/docpile/infrastructure/storage"
@@ -56,7 +57,7 @@ func main() {
 	var applicator infrastructure.Applicator = &Applicator{}
 	applicator = eventstore.NewApplicator(applicator, store)
 
-	var handler infrastructure.Handler = domain.NewHandler(aggregate, applicator)
+	var handler infrastructure.Handler = handlers.NewDomainHandler(aggregate, applicator)
 	handler = domain.NewWriteAssetHandler(handler, storage.NewFileStorage(workspacePath))
 
 	tagController := http.NewTagWriteController(handler)
