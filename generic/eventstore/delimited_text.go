@@ -43,7 +43,6 @@ func (this *DelimitedText) writeMessageToBuffer(message interface{}, destination
 	destination.WriteString(this.typeName(message))
 	destination.WriteString(fieldDelimiter)
 	this.serializer.Serialize(message, destination)
-	destination.WriteString(lineBreak)
 }
 func (this *DelimitedText) typeName(message interface{}) string {
 	if typeName, err := this.registry.Name(reflect.TypeOf(message)); err == nil {
@@ -71,7 +70,10 @@ func (this *DelimitedText) load(channel chan<- interface{}) {
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
 			panic(err)
+		} else if len(scanner.Bytes()) == 0 {
+			continue
 		}
+
 		channel <- this.parseLine(scanner.Bytes())
 	}
 
@@ -104,7 +106,6 @@ func (this *DelimitedText) createInstance(name string) reflect.Value {
 
 const (
 	fieldDelimiter  = "\t"
-	lineBreak       = "\n"
 	defaultFilename = "events.txt"
 )
 
