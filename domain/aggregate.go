@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"bitbucket.org/jonathanoliver/docpile/events"
-	"bitbucket.org/jonathanoliver/docpile/infrastructure"
-	"bitbucket.org/jonathanoliver/docpile/infrastructure/identity"
+	"bitbucket.org/jonathanoliver/docpile/library"
+	"bitbucket.org/jonathanoliver/docpile/library/identity"
 	"github.com/smartystreets/clock"
 )
 
@@ -38,7 +38,7 @@ func NewAggregate(identity identity.Generator) *Aggregate {
 	}
 }
 
-func (this *Aggregate) Handle(message interface{}) infrastructure.Result {
+func (this *Aggregate) Handle(message interface{}) library.Result {
 	switch message := message.(type) {
 
 	case AddTag:
@@ -64,7 +64,7 @@ func (this *Aggregate) Handle(message interface{}) infrastructure.Result {
 	}
 }
 
-func (this *Aggregate) AddTag(name string) infrastructure.Result {
+func (this *Aggregate) AddTag(name string) library.Result {
 	if id, contains := this.tagsByNormalizedName[normalizeTag(name)]; contains {
 		return newResult(id, TagAlreadyExistsError)
 	}
@@ -76,7 +76,7 @@ func (this *Aggregate) AddTag(name string) infrastructure.Result {
 		TagName:   name,
 	})
 }
-func (this *Aggregate) RenameTag(id uint64, name string) infrastructure.Result {
+func (this *Aggregate) RenameTag(id uint64, name string) library.Result {
 	if result := this.validTagInput(id, name); result.Error != nil {
 		return result
 	}
@@ -88,7 +88,7 @@ func (this *Aggregate) RenameTag(id uint64, name string) infrastructure.Result {
 		NewName:   name,
 	})
 }
-func (this *Aggregate) DefineTagSynonym(id uint64, name string) infrastructure.Result {
+func (this *Aggregate) DefineTagSynonym(id uint64, name string) library.Result {
 	if result := this.validTagInput(id, name); result.Error != nil {
 		return result
 	}
@@ -99,7 +99,7 @@ func (this *Aggregate) DefineTagSynonym(id uint64, name string) infrastructure.R
 		TagName:   name,
 	})
 }
-func (this *Aggregate) RemoveTagSynonym(id uint64, name string) infrastructure.Result {
+func (this *Aggregate) RemoveTagSynonym(id uint64, name string) library.Result {
 	if result := this.validTagInput(id, name); result.Error != nil {
 		return result
 	}
@@ -110,7 +110,7 @@ func (this *Aggregate) RemoveTagSynonym(id uint64, name string) infrastructure.R
 		TagName:   name,
 	})
 }
-func (this *Aggregate) validTagInput(id uint64, name string) infrastructure.Result {
+func (this *Aggregate) validTagInput(id uint64, name string) library.Result {
 	if _, contains := this.tagsByID[id]; !contains {
 		return newResult(0, TagNotFoundError)
 	} else if id, contains = this.tagsByNormalizedName[normalizeTag(name)]; contains {
@@ -123,7 +123,7 @@ func normalizeTag(value string) string {
 	return strings.ToLower(value)
 }
 
-func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256Hash) infrastructure.Result {
+func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256Hash) library.Result {
 	if id, contains := this.managedAssets[hash]; contains {
 		return newResult(id, AssetAlreadyExistsError)
 	}
@@ -138,7 +138,7 @@ func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256H
 		Key:       fmt.Sprintf("%d%s", id, path.Ext(name)),
 	})
 }
-func (this *Aggregate) ImportCloudAsset(name, provider, resource string) infrastructure.Result {
+func (this *Aggregate) ImportCloudAsset(name, provider, resource string) library.Result {
 	if _, contains := this.cloudAssets[normalizeCloudAsset(provider, resource)]; contains {
 		return newResult(0, AssetAlreadyExistsError)
 	}
@@ -156,7 +156,7 @@ func normalizeCloudAsset(provider, resource string) string {
 	return fmt.Sprintf("%s.%s", strings.ToLower(provider), resource)
 }
 
-func (this *Aggregate) DefineDocument(doc DocumentDefinition) infrastructure.Result {
+func (this *Aggregate) DefineDocument(doc DocumentDefinition) library.Result {
 	if err := this.validDefinition(doc); err != nil {
 		return newResult(0, err)
 	}
@@ -196,7 +196,7 @@ func (this *Aggregate) validDefinition(doc DocumentDefinition) error {
 	return nil
 }
 
-func (this *Aggregate) raise(id uint64, event interface{}) infrastructure.Result {
+func (this *Aggregate) raise(id uint64, event interface{}) library.Result {
 	this.apply(event)
 	this.events = append(this.events, event)
 	return newResult(id, nil)
@@ -266,8 +266,8 @@ func (this *Aggregate) Consume() []interface{} {
 	return consumed
 }
 
-func newResult(id uint64, err error) infrastructure.Result {
-	return infrastructure.Result{ID: id, Error: err}
+func newResult(id uint64, err error) library.Result {
+	return library.Result{ID: id, Error: err}
 }
 
 var (

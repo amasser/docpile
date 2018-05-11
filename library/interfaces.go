@@ -1,4 +1,4 @@
-package infrastructure
+package library
 
 type Aggregate interface {
 	Handler

@@ -9,20 +9,20 @@ import (
 	"path"
 
 	"bitbucket.org/jonathanoliver/docpile/events"
-	"bitbucket.org/jonathanoliver/docpile/infrastructure"
-	"bitbucket.org/jonathanoliver/docpile/infrastructure/storage"
+	"bitbucket.org/jonathanoliver/docpile/library"
+	"bitbucket.org/jonathanoliver/docpile/library/storage"
 )
 
 type WriteAssetHandler struct {
-	inner  infrastructure.Handler
+	inner  library.Handler
 	writer storage.Writer
 }
 
-func NewWriteAssetHandler(inner infrastructure.Handler, writer storage.Writer) *WriteAssetHandler {
+func NewWriteAssetHandler(inner library.Handler, writer storage.Writer) *WriteAssetHandler {
 	return &WriteAssetHandler{inner: inner, writer: writer}
 }
 
-func (this *WriteAssetHandler) Handle(message interface{}) infrastructure.Result {
+func (this *WriteAssetHandler) Handle(message interface{}) library.Result {
 	switch message := message.(type) {
 	case ImportManagedStreamingAsset:
 		return this.handle(message)
@@ -30,7 +30,7 @@ func (this *WriteAssetHandler) Handle(message interface{}) infrastructure.Result
 		return this.inner.Handle(message)
 	}
 }
-func (this *WriteAssetHandler) handle(message ImportManagedStreamingAsset) infrastructure.Result {
+func (this *WriteAssetHandler) handle(message ImportManagedStreamingAsset) library.Result {
 	buffer, err := bufferStream(message.Size, message.Body)
 	if err != nil {
 		return newResult(0, err)
@@ -48,7 +48,7 @@ func (this *WriteAssetHandler) handle(message ImportManagedStreamingAsset) infra
 	return result
 }
 
-func (this *WriteAssetHandler) sendMessage(name, mime string, buffer *bytes.Buffer) infrastructure.Result {
+func (this *WriteAssetHandler) sendMessage(name, mime string, buffer *bytes.Buffer) library.Result {
 	return this.inner.Handle(ImportManagedAsset{
 		Name:     name,
 		MIMEType: mime,

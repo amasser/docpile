@@ -1,13 +1,13 @@
 package eventstore
 
-import "bitbucket.org/jonathanoliver/docpile/infrastructure"
+import "bitbucket.org/jonathanoliver/docpile/library"
 
 type Applicator struct {
-	inner infrastructure.Applicator
+	inner library.Applicator
 	store EventStore
 }
 
-func NewApplicator(inner infrastructure.Applicator, store EventStore) *Applicator {
+func NewApplicator(inner library.Applicator, store EventStore) *Applicator {
 	return &Applicator{inner: inner, store: store}
 }
 

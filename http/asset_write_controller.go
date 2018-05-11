@@ -3,15 +3,15 @@ package http
 import (
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/http/inputs"
-	"bitbucket.org/jonathanoliver/docpile/infrastructure"
+	"bitbucket.org/jonathanoliver/docpile/library"
 	"github.com/smartystreets/detour"
 )
 
 type AssetWriteController struct {
-	handler infrastructure.Handler
+	handler library.Handler
 }
 
-func NewAssetWriteController(handler infrastructure.Handler) *AssetWriteController {
+func NewAssetWriteController(handler library.Handler) *AssetWriteController {
 	return &AssetWriteController{handler: handler}
 }
 
@@ -26,7 +26,7 @@ func (this *AssetWriteController) ImportManaged(input *inputs.ImportManagedAsset
 		return UnknownErrorResult
 	}
 }
-func (this *AssetWriteController) importManaged(input *inputs.ImportManagedAsset) infrastructure.Result {
+func (this *AssetWriteController) importManaged(input *inputs.ImportManagedAsset) library.Result {
 	return this.handler.Handle(domain.ImportManagedStreamingAsset{
 		Name:     input.Name,
 		MIMEType: input.MIMEType,

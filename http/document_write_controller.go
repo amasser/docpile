@@ -3,15 +3,15 @@ package http
 import (
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/http/inputs"
-	"bitbucket.org/jonathanoliver/docpile/infrastructure"
+	"bitbucket.org/jonathanoliver/docpile/library"
 	"github.com/smartystreets/detour"
 )
 
 type DocumentWriteController struct {
-	handler infrastructure.Handler
+	handler library.Handler
 }
 
-func NewDocumentWriteController(handler infrastructure.Handler) *DocumentWriteController {
+func NewDocumentWriteController(handler library.Handler) *DocumentWriteController {
 	return &DocumentWriteController{handler: handler}
 }
 
@@ -28,7 +28,7 @@ func (this *DocumentWriteController) Define(input *inputs.DefineDocument) detour
 		return UnknownErrorResult
 	}
 }
-func (this *DocumentWriteController) define(input *inputs.DefineDocument) infrastructure.Result {
+func (this *DocumentWriteController) define(input *inputs.DefineDocument) library.Result {
 	return this.handler.Handle(domain.DefineDocument{
 		Document: domain.DocumentDefinition{
 			AssetID:     input.AssetID,
