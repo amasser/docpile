@@ -2,8 +2,6 @@ package events
 
 import "time"
 
-type SHA256Hash [32]byte
-
 type TagAdded struct {
 	TagID     uint64    `json:"tag_id"`
 	Timestamp time.Time `json:"timestamp"`
@@ -34,6 +32,7 @@ type ManagedAssetImported struct {
 	Name      string     `json:"name"`
 	Key       string     `json:"key"`
 }
+type SHA256Hash [32]byte
 
 // NOTE: this could simply be for resources which are unmanaged rather than cloud
 type CloudAssetImported struct {
