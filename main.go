@@ -34,8 +34,7 @@ func main() {
 	aggregate := domain.NewAggregate(identity)
 
 	store := storage.NewTextEventStore(
-		storage.NewLocalStorage(workspacePath).Append(),
-		events.InstanceRegistry)
+		storage.NewLocalStorage(workspacePath).Append(), events.MessageRegistry)
 
 	// TODO: send to projections
 	for message := range store.Load() {

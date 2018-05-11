@@ -13,10 +13,10 @@ import (
 type TextEventStore struct {
 	filename string
 	store    ReadWriter
-	registry func(string) reflect.Type
+	registry Registry
 }
 
-func NewTextEventStore(store ReadWriter, registry func(string) reflect.Type) *TextEventStore {
+func NewTextEventStore(store ReadWriter, registry Registry) *TextEventStore {
 	return &TextEventStore{
 		filename: defaultFilename,
 		store:    store,
@@ -26,15 +26,22 @@ func NewTextEventStore(store ReadWriter, registry func(string) reflect.Type) *Te
 
 func (this *TextEventStore) Store(messages []interface{}) error {
 	buffer := bytes.NewBuffer([]byte{})
-	writeToBuffer(buffer, messages)
+	this.writeToBuffer(buffer, messages)
 	return this.store.Write(this.filename, ioutil.NopCloser(buffer))
 }
-func writeToBuffer(buffer *bytes.Buffer, messages []interface{}) {
+func (this *TextEventStore) writeToBuffer(buffer *bytes.Buffer, messages []interface{}) {
 	for _, message := range messages {
-		buffer.WriteString(reflect.TypeOf(message).Name())
+		buffer.WriteString(this.typeName(message))
 		buffer.WriteString(fieldDelimiter)
 		buffer.WriteString(serialize(message))
 		buffer.WriteString(lineBreak)
+	}
+}
+func (this *TextEventStore) typeName(message interface{}) string {
+	if typeName, err := this.registry.Name(reflect.TypeOf(message)); err == nil {
+		return typeName
+	} else {
+		panic(err)
 	}
 }
 func serialize(message interface{}) string {
@@ -79,12 +86,19 @@ func (this *TextEventStore) parseLine(line []byte) interface{} {
 	return this.deserialize(messageType, line[index:])
 }
 func (this *TextEventStore) deserialize(messageType string, body []byte) interface{} {
-	instance := reflect.New(this.registry(messageType))
+	instance := this.createInstance(messageType)
 	if err := json.Unmarshal(body, instance.Interface()); err != nil {
 		panic(err)
 	}
 
 	return instance.Elem().Interface()
+}
+func (this *TextEventStore) createInstance(name string) reflect.Value {
+	if messageType, err := this.registry.Type(name); err == nil {
+		return reflect.New(messageType)
+	} else {
+		panic(err)
+	}
 }
 
 const (

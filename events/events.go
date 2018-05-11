@@ -1,10 +1,6 @@
 package events
 
-import (
-	"log"
-	"reflect"
-	"time"
-)
+import "time"
 
 type SHA256Hash [32]byte
 
@@ -61,28 +57,14 @@ type DocumentDefined struct {
 	Description string     `json:"description,omitempty"`
 }
 
-///////////////////////////////////////////////////////////
-
 func init() {
-	registerType("tag-added", TagAdded{})
-	registerType("tag-removed", TagRenamed{})
-	registerType("tag-synonym-defined", TagSynonymDefined{})
-	registerType("tag-synonym-removed", TagSynonymRemoved{})
-	registerType("managed-asset-imported", ManagedAssetImported{})
-	registerType("cloud-asset-imported", CloudAssetImported{})
-	registerType("document-defined", DocumentDefined{})
-}
-func registerType(name string, instance interface{}) {
-	instanceType := reflect.TypeOf(instance)
-	registry[name] = instanceType
-}
-func InstanceRegistry(name string) reflect.Type {
-	if registeredType, contains := registry[name]; contains {
-		return registeredType
-	} else {
-		log.Fatalf("Unknown message type: [%s]\n", name)
-		return nil
-	}
+	MessageRegistry.Register("tag-added", TagAdded{})
+	MessageRegistry.Register("tag-removed", TagRenamed{})
+	MessageRegistry.Register("tag-synonym-defined", TagSynonymDefined{})
+	MessageRegistry.Register("tag-synonym-removed", TagSynonymRemoved{})
+	MessageRegistry.Register("managed-asset-imported", ManagedAssetImported{})
+	MessageRegistry.Register("cloud-asset-imported", CloudAssetImported{})
+	MessageRegistry.Register("document-defined", DocumentDefined{})
 }
 
-var registry = map[string]reflect.Type{}
+var MessageRegistry = NewRegistry()
