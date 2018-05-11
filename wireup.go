@@ -2,6 +2,7 @@ package main
 
 import (
 	stdhttp "net/http"
+	"sync"
 
 	"bitbucket.org/jonathanoliver/docpile/app/domain"
 	"bitbucket.org/jonathanoliver/docpile/app/events"
@@ -19,10 +20,11 @@ import (
 type Wireup struct {
 	indexPath string
 	dataPath  string
+	mutex     *sync.RWMutex
 }
 
 func NewWireup(indexPath string, dataPath string) *Wireup {
-	return &Wireup{indexPath: indexPath, dataPath: dataPath}
+	return &Wireup{indexPath: indexPath, dataPath: dataPath, mutex: &sync.RWMutex{}}
 }
 
 func (this *Wireup) BuildDomain() *domain.Aggregate {
@@ -59,6 +61,9 @@ func (this *Wireup) BuildMessageHandler(aggregate handlers.Aggregate, store even
 }
 func (this *Wireup) buildApplicator(store eventstore.EventStore) applicators.Applicator {
 	applicator := SampleApplicator()
+	applicator = applicators.NewFanout(applicator)
+	applicator = applicators.NewMutex(applicator, this.mutex)
+	applicator = applicators.NewChannel(applicator, applicators.StartChannel())
 	applicator = eventstore.NewApplicator(applicator, store)
 	return applicator
 }
@@ -76,6 +81,8 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler) stdhttp.Handl
 
 	router.Handler("PUT", "/assets", detour.New(assetController.ImportManaged))
 	router.Handler("PUT", "/documents", detour.New(documentController.Define))
+
+	// TODO: protect reads with this.mutex.RLocker()
 
 	return router
 
