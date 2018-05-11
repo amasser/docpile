@@ -8,12 +8,12 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/app/domain"
 	"bitbucket.org/jonathanoliver/docpile/app/events"
 	"bitbucket.org/jonathanoliver/docpile/app/http"
-	"bitbucket.org/jonathanoliver/docpile/library"
-	"bitbucket.org/jonathanoliver/docpile/library/eventstore"
-	"bitbucket.org/jonathanoliver/docpile/library/handlers"
-	"bitbucket.org/jonathanoliver/docpile/library/identity"
-	"bitbucket.org/jonathanoliver/docpile/library/serialization"
-	"bitbucket.org/jonathanoliver/docpile/library/storage"
+	"bitbucket.org/jonathanoliver/docpile/generic"
+	"bitbucket.org/jonathanoliver/docpile/generic/eventstore"
+	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
+	"bitbucket.org/jonathanoliver/docpile/generic/identity"
+	"bitbucket.org/jonathanoliver/docpile/generic/serialization"
+	"bitbucket.org/jonathanoliver/docpile/generic/storage"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
 )
@@ -54,10 +54,10 @@ func main() {
 		aggregate.Apply(message)
 	}
 
-	var applicator library.Applicator = &Applicator{}
+	var applicator generic.Applicator = &Applicator{}
 	applicator = eventstore.NewApplicator(applicator, store)
 
-	var handler library.Handler = handlers.NewDomainHandler(aggregate, applicator)
+	var handler generic.Handler = handlers.NewDomainHandler(aggregate, applicator)
 	handler = domain.NewWriteAssetHandler(handler, storage.NewFileStorage(workspacePath))
 
 	tagController := http.NewTagWriteController(handler)
