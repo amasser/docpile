@@ -5,15 +5,13 @@ type Channel struct {
 	inner   Applicator
 }
 
-func NewChannel(inner Applicator) *Channel {
-	return &Channel{
-		inner:   inner,
-		channel: make(chan []interface{}, 1024),
-	}
-}
+func NewChannel(inner Applicator, options ...ChannelOption) *Channel {
+	this := &Channel{inner: inner, channel: make(chan []interface{}, 1024)}
 
-func (this *Channel) Start() *Channel {
-	go this.Listen()
+	for _, option := range options {
+		option(this)
+	}
+
 	return this
 }
 
@@ -26,3 +24,9 @@ func (this *Channel) Listen() {
 func (this *Channel) Apply(messages []interface{}) {
 	this.channel <- messages
 }
+
+////////////////////////////////////////////////////////
+
+type ChannelOption func(*Channel)
+
+func Start() ChannelOption { return func(this *Channel) { go this.Listen() } }
