@@ -1,12 +1,12 @@
 package projections
 
 type Projector struct {
-	tags *AllTags
+	allTags *AllTags
 }
 
 func NewProjector() *Projector {
 	return &Projector{
-		tags: NewAllTags(),
+		allTags: NewAllTags(),
 	}
 }
 
@@ -16,7 +16,7 @@ func (this *Projector) Apply(messages []interface{}) {
 	}
 }
 func (this *Projector) apply(message interface{}) {
-	this.tags.Transform(message)
+	this.allTags.Transform(message)
 }
 
-func (this *Projector) ListTags() interface{} { return this.tags }
+func (this *Projector) ListTags() interface{} { return this.allTags.List() }

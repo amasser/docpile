@@ -7,11 +7,20 @@ import (
 )
 
 type AllTags struct {
-	Tags []*Tag `json:"tags,omitempty"`
+	index map[uint64]int
+	tags  []Tag
 }
 
 func NewAllTags() *AllTags {
-	return &AllTags{}
+	return &AllTags{index: map[uint64]int{}}
+}
+
+func (this *AllTags) loadTag(tagID uint64) *Tag {
+	if index, contains := this.index[tagID]; contains {
+		return &this.tags[index]
+	} else {
+		return &Tag{Synonyms: map[string]time.Time{}}
+	}
 }
 
 func (this *AllTags) Transform(message interface{}) {
@@ -28,44 +37,24 @@ func (this *AllTags) Transform(message interface{}) {
 }
 
 func (this *AllTags) tagAdded(message events.TagAdded) {
-	for _, tag := range this.Tags {
-		if tag.TagID == message.TagID {
-			return
-		}
+	if _, contains := this.index[message.TagID]; !contains {
+		this.tags = append(this.tags, newTag(message))
+		this.index[message.TagID] = len(this.tags) - 1
 	}
-
-	this.Tags = append(this.Tags, newTag(message))
 }
 func (this *AllTags) tagRenamed(message events.TagRenamed) {
-	for _, tag := range this.Tags {
-		if tag.TagID != message.TagID {
-			continue
-		}
-
-		tag.TagName = message.NewName
-		break
-	}
+	this.loadTag(message.TagID).TagName = message.NewName
 }
 func (this *AllTags) synonymDefined(message events.TagSynonymDefined) {
-	for _, tag := range this.Tags {
-		if tag.TagID != message.TagID {
-			continue
-		}
-
-		tag.Synonyms[message.TagName] = message.Timestamp
-		break
-	}
+	this.loadTag(message.TagID).Synonyms[message.TagName] = message.Timestamp
 }
 func (this *AllTags) synonymRemoved(message events.TagSynonymRemoved) {
-	for _, tag := range this.Tags {
-		if tag.TagID != message.TagID {
-			continue
-		}
-
-		delete(tag.Synonyms, message.TagName)
-		break
-	}
+	delete(this.loadTag(message.TagID).Synonyms, message.TagName)
 }
+
+func (this *AllTags) List() []Tag { return this.tags }
+
+//////////////////////////////////////////////////////////////
 
 type Tag struct {
 	TagID     uint64               `json:"tag_id"`
@@ -74,8 +63,8 @@ type Tag struct {
 	Synonyms  map[string]time.Time `json:"synonyms,omitempty"`
 }
 
-func newTag(message events.TagAdded) *Tag {
-	return &Tag{
+func newTag(message events.TagAdded) Tag {
+	return Tag{
 		TagID:     message.TagID,
 		Timestamp: message.Timestamp,
 		TagName:   message.TagName,
