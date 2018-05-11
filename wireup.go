@@ -14,6 +14,7 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/generic/identity"
 	"bitbucket.org/jonathanoliver/docpile/generic/serialization"
 	"bitbucket.org/jonathanoliver/docpile/generic/storage"
+	"bitbucket.org/jonathanoliver/docpile/generic/web"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
 )
@@ -72,16 +73,15 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	documentWriter := http.NewDocumentWriter(application)
 
 	router := buildRouter()
-	router.Handler("PUT", "/tags", detour.New(tagWriter.Add))
-	router.Handler("POST", "/tags/name", detour.New(tagWriter.Rename))
-	router.Handler("PUT", "/tags/synonym", detour.New(tagWriter.DefineSynonym))
-	router.Handler("DELETE", "/tags/synonym", detour.New(tagWriter.RemoveSynonym))
+	router.Handler("PUT", "/tags", this.newWriter(tagWriter.Add))
+	router.Handler("POST", "/tags/name", this.newWriter(tagWriter.Rename))
+	router.Handler("PUT", "/tags/synonym", this.newWriter(tagWriter.DefineSynonym))
+	router.Handler("DELETE", "/tags/synonym", this.newWriter(tagWriter.RemoveSynonym))
 
-	router.Handler("PUT", "/assets", detour.New(assetWriter.ImportManaged))
-	router.Handler("PUT", "/documents", detour.New(documentWriter.Define))
+	router.Handler("PUT", "/assets", this.newWriter(assetWriter.ImportManaged))
+	router.Handler("PUT", "/documents", this.newWriter(documentWriter.Define))
 
-	// TODO: protect reads with this.mutex.RLocker()
-	router.Handler("GET", "/tags", detour.New(tagReader.List))
+	router.Handler("GET", "/tags", this.newReader(tagReader.List))
 
 	return router
 
@@ -95,6 +95,13 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	//   PUT /tags/:id/documents
 	//   DELETE /tags/:id/documents/:documents
 }
+func (this *Wireup) newWriter(action interface{}) stdhttp.Handler {
+	return detour.New(action)
+}
+func (this *Wireup) newReader(action interface{}) stdhttp.Handler {
+	return web.NewLockHandler(this.mutex.RLocker(), detour.New(action))
+}
+
 func buildRouter() *httprouter.Router {
 	router := httprouter.New()
 	router.HandleMethodNotAllowed = true
