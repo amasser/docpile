@@ -4,7 +4,7 @@ type Applicator interface {
 	Apply([]interface{})
 }
 
-type Locker interface {
+type locker interface {
 	Lock()
 	Unlock()
 }

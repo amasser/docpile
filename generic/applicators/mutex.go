@@ -2,10 +2,10 @@ package applicators
 
 type Mutex struct {
 	inner Applicator
-	mutex Locker
+	mutex locker
 }
 
-func NewMutex(inner Applicator, mutex Locker) *Mutex {
+func NewMutex(inner Applicator, mutex locker) *Mutex {
 	return &Mutex{inner: inner, mutex: mutex}
 }
 
