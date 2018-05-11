@@ -25,6 +25,12 @@ func NewRegistry(options ...RegistryOption) *Registry {
 	return this
 }
 
+func (this *Registry) AddMultiple(types map[string]interface{}) {
+	for typeName, instance := range types {
+		this.Add(typeName, instance)
+	}
+}
+
 func (this *Registry) Add(typeName string, instance interface{}) {
 	typeName = strings.TrimSpace(typeName)
 	instanceType := reflect.TypeOf(instance)

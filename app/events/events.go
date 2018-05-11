@@ -56,3 +56,13 @@ type DocumentDefined struct {
 	Documents   []uint64   `json:"documents,omitempty"`
 	Description string     `json:"description,omitempty"`
 }
+
+var Types = map[string]interface{}{
+	"tag-added":              TagAdded{},
+	"tag-removed":            TagRenamed{},
+	"tag-synonym-defined":    TagSynonymDefined{},
+	"tag-synonym-removed":    TagSynonymRemoved{},
+	"managed-asset-imported": ManagedAssetImported{},
+	"cloud-asset-imported":   CloudAssetImported{},
+	"document-defined":       DocumentDefined{},
+}

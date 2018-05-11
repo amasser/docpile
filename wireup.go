@@ -39,15 +39,7 @@ func (this *Wireup) BuildEventStore(aggregate handlers.Aggregate) *eventstore.De
 }
 func (this *Wireup) buildTypeRegistry() eventstore.TypeRegistry {
 	var registry = eventstore.NewRegistry(eventstore.PanicOnUnknownType())
-
-	registry.Add("tag-added", events.TagAdded{})
-	registry.Add("tag-removed", events.TagRenamed{})
-	registry.Add("tag-synonym-defined", events.TagSynonymDefined{})
-	registry.Add("tag-synonym-removed", events.TagSynonymRemoved{})
-	registry.Add("managed-asset-imported", events.ManagedAssetImported{})
-	registry.Add("cloud-asset-imported", events.CloudAssetImported{})
-	registry.Add("document-defined", events.DocumentDefined{})
-
+	registry.AddMultiple(events.Types)
 	return registry
 }
 
