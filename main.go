@@ -8,7 +8,6 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/app/domain"
 	"bitbucket.org/jonathanoliver/docpile/app/events"
 	"bitbucket.org/jonathanoliver/docpile/app/http"
-	"bitbucket.org/jonathanoliver/docpile/generic"
 	"bitbucket.org/jonathanoliver/docpile/generic/applicators"
 	"bitbucket.org/jonathanoliver/docpile/generic/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
@@ -58,7 +57,7 @@ func main() {
 	var applicator applicators.Applicator = &Applicator{}
 	applicator = eventstore.NewApplicator(applicator, store)
 
-	var handler generic.Handler = handlers.NewDomainHandler(aggregate, applicator)
+	var handler handlers.Handler = handlers.NewDomainHandler(aggregate, applicator)
 	handler = domain.NewWriteAssetHandler(handler, storage.NewFileStorage(workspacePath))
 
 	tagController := http.NewTagWriteController(handler)

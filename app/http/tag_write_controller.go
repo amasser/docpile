@@ -3,15 +3,15 @@ package http
 import (
 	"bitbucket.org/jonathanoliver/docpile/app/domain"
 	"bitbucket.org/jonathanoliver/docpile/app/http/inputs"
-	"bitbucket.org/jonathanoliver/docpile/generic"
+	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
 	"github.com/smartystreets/detour"
 )
 
 type TagWriteController struct {
-	handler generic.Handler
+	handler handlers.Handler
 }
 
-func NewTagWriteController(handler generic.Handler) *TagWriteController {
+func NewTagWriteController(handler handlers.Handler) *TagWriteController {
 	return &TagWriteController{handler: handler}
 }
 

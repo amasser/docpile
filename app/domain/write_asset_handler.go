@@ -9,20 +9,20 @@ import (
 	"path"
 
 	"bitbucket.org/jonathanoliver/docpile/app/events"
-	"bitbucket.org/jonathanoliver/docpile/generic"
+	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
 	"bitbucket.org/jonathanoliver/docpile/generic/storage"
 )
 
 type WriteAssetHandler struct {
-	inner  generic.Handler
+	inner  handlers.Handler
 	writer storage.Writer
 }
 
-func NewWriteAssetHandler(inner generic.Handler, writer storage.Writer) *WriteAssetHandler {
+func NewWriteAssetHandler(inner handlers.Handler, writer storage.Writer) *WriteAssetHandler {
 	return &WriteAssetHandler{inner: inner, writer: writer}
 }
 
-func (this *WriteAssetHandler) Handle(message interface{}) generic.Result {
+func (this *WriteAssetHandler) Handle(message interface{}) handlers.Result {
 	switch message := message.(type) {
 	case ImportManagedStreamingAsset:
 		return this.handle(message)
@@ -30,7 +30,7 @@ func (this *WriteAssetHandler) Handle(message interface{}) generic.Result {
 		return this.inner.Handle(message)
 	}
 }
-func (this *WriteAssetHandler) handle(message ImportManagedStreamingAsset) generic.Result {
+func (this *WriteAssetHandler) handle(message ImportManagedStreamingAsset) handlers.Result {
 	buffer, err := bufferStream(message.Size, message.Body)
 	if err != nil {
 		return newResult(0, err)
@@ -48,7 +48,7 @@ func (this *WriteAssetHandler) handle(message ImportManagedStreamingAsset) gener
 	return result
 }
 
-func (this *WriteAssetHandler) sendMessage(name, mime string, buffer *bytes.Buffer) generic.Result {
+func (this *WriteAssetHandler) sendMessage(name, mime string, buffer *bytes.Buffer) handlers.Result {
 	return this.inner.Handle(ImportManagedAsset{
 		Name:     name,
 		MIMEType: mime,
