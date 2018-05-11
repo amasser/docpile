@@ -17,7 +17,9 @@ func NewFileStorage(workspace string) *FileStorage {
 		workspace:  workspace,
 		writeFlags: os.O_CREATE | os.O_WRONLY,
 	}
-	this.ensureWorkspace()
+
+	this.ensureWorkspace() // TODO: functional options
+
 	return this
 }
 func (this *FileStorage) ensureWorkspace() {
@@ -37,7 +39,7 @@ func (this *FileStorage) composeFilename(key string) string {
 	return path.Join(this.workspace, key)
 }
 func (this *FileStorage) Append() *FileStorage {
-	this.writeFlags |= os.O_APPEND
+	this.writeFlags |= os.O_APPEND // TODO: functional options
 	return this
 }
 
