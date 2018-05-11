@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"path"
@@ -238,3 +239,12 @@ func (this *Aggregate) Consume() []interface{} {
 	this.events = nil // don't re-use the buffer
 	return consumed
 }
+
+var (
+	TagAlreadyExistsError   = errors.New("tag already exists")
+	AssetAlreadyExistsError = errors.New("asset already exists")
+	AssetNotFoundError      = errors.New("asset not found")
+	TagNotFoundError        = errors.New("tag not found")
+	DocumentNotFoundError   = errors.New("document not found")
+	StoreAssetError         = errors.New("unable to storage asset")
+)
