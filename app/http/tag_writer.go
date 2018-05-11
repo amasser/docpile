@@ -7,29 +7,29 @@ import (
 	"github.com/smartystreets/detour"
 )
 
-type TagWriteController struct {
+type TagWriter struct {
 	handler handlers.Handler
 }
 
-func NewTagWriteController(handler handlers.Handler) *TagWriteController {
-	return &TagWriteController{handler: handler}
+func NewTagWriter(handler handlers.Handler) *TagWriter {
+	return &TagWriter{handler: handler}
 }
 
-func (this *TagWriteController) Add(input *inputs.AddTag) detour.Renderer {
+func (this *TagWriter) Add(input *inputs.AddTag) detour.Renderer {
 	return this.renderTagResult(domain.AddTag{Name: input.Name})
 }
-func (this *TagWriteController) Rename(input *inputs.RenameTag) detour.Renderer {
+func (this *TagWriter) Rename(input *inputs.RenameTag) detour.Renderer {
 	return this.renderTagResult(domain.RenameTag{ID: input.ID, Name: input.Name})
 }
 
-func (this *TagWriteController) DefineSynonym(input *inputs.DefineTagSynonym) detour.Renderer {
+func (this *TagWriter) DefineSynonym(input *inputs.DefineTagSynonym) detour.Renderer {
 	return this.renderTagResult(domain.DefineTagSynonym{ID: input.ID, Name: input.Name})
 }
-func (this *TagWriteController) RemoveSynonym(input *inputs.RemoveTagSynonym) detour.Renderer {
+func (this *TagWriter) RemoveSynonym(input *inputs.RemoveTagSynonym) detour.Renderer {
 	return this.renderTagResult(domain.RemoveTagSynonym{ID: input.ID, Name: input.Name})
 }
 
-func (this *TagWriteController) renderTagResult(message interface{}) detour.Renderer {
+func (this *TagWriter) renderTagResult(message interface{}) detour.Renderer {
 	if result := this.handler.Handle(message); result.ID == 0 && result.Error == nil {
 		return nil
 	} else if result.ID > 0 && result.Error == nil {

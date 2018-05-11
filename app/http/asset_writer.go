@@ -7,15 +7,15 @@ import (
 	"github.com/smartystreets/detour"
 )
 
-type AssetWriteController struct {
+type AssetWriter struct {
 	handler handlers.Handler
 }
 
-func NewAssetWriteController(handler handlers.Handler) *AssetWriteController {
-	return &AssetWriteController{handler: handler}
+func NewAssetWriter(handler handlers.Handler) *AssetWriter {
+	return &AssetWriter{handler: handler}
 }
 
-func (this *AssetWriteController) ImportManaged(input *inputs.ImportManagedAsset) detour.Renderer {
+func (this *AssetWriter) ImportManaged(input *inputs.ImportManagedAsset) detour.Renderer {
 	if result := this.importManaged(input); result.Error == nil {
 		return newEntityResult(result.ID)
 	} else if result.Error == domain.AssetAlreadyExistsError {
@@ -26,7 +26,7 @@ func (this *AssetWriteController) ImportManaged(input *inputs.ImportManagedAsset
 		return UnknownErrorResult
 	}
 }
-func (this *AssetWriteController) importManaged(input *inputs.ImportManagedAsset) handlers.Result {
+func (this *AssetWriter) importManaged(input *inputs.ImportManagedAsset) handlers.Result {
 	return this.handler.Handle(domain.ImportManagedStreamingAsset{
 		Name:     input.Name,
 		MIMEType: input.MIMEType,

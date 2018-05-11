@@ -61,18 +61,18 @@ func (this *Wireup) buildApplicator(store eventstore.EventStore) applicators.App
 }
 
 func (this *Wireup) BuildHTTPHandler(application handlers.Handler) stdhttp.Handler {
-	tagController := http.NewTagWriteController(application)
-	assetController := http.NewAssetWriteController(application)
-	documentController := http.NewDocumentWriteController(application)
+	tagWriter := http.NewTagWriter(application)
+	assetWriter := http.NewAssetWriter(application)
+	documentWriter := http.NewDocumentWriter(application)
 
 	router := buildRouter()
-	router.Handler("PUT", "/tags", detour.New(tagController.Add))
-	router.Handler("POST", "/tags/name", detour.New(tagController.Rename))
-	router.Handler("PUT", "/tags/synonym", detour.New(tagController.DefineSynonym))
-	router.Handler("DELETE", "/tags/synonym", detour.New(tagController.RemoveSynonym))
+	router.Handler("PUT", "/tags", detour.New(tagWriter.Add))
+	router.Handler("POST", "/tags/name", detour.New(tagWriter.Rename))
+	router.Handler("PUT", "/tags/synonym", detour.New(tagWriter.DefineSynonym))
+	router.Handler("DELETE", "/tags/synonym", detour.New(tagWriter.RemoveSynonym))
 
-	router.Handler("PUT", "/assets", detour.New(assetController.ImportManaged))
-	router.Handler("PUT", "/documents", detour.New(documentController.Define))
+	router.Handler("PUT", "/assets", detour.New(assetWriter.ImportManaged))
+	router.Handler("PUT", "/documents", detour.New(documentWriter.Define))
 
 	// TODO: protect reads with this.mutex.RLocker()
 
