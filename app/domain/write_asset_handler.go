@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"path"
 
-	"bitbucket.org/jonathanoliver/docpile/events"
+	"bitbucket.org/jonathanoliver/docpile/app/events"
 	"bitbucket.org/jonathanoliver/docpile/library"
 	"bitbucket.org/jonathanoliver/docpile/library/storage"
 )

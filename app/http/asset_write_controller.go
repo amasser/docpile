@@ -1,8 +1,8 @@
 package http
 
 import (
-	"bitbucket.org/jonathanoliver/docpile/domain"
-	"bitbucket.org/jonathanoliver/docpile/http/inputs"
+	"bitbucket.org/jonathanoliver/docpile/app/domain"
+	"bitbucket.org/jonathanoliver/docpile/app/http/inputs"
 	"bitbucket.org/jonathanoliver/docpile/library"
 	"github.com/smartystreets/detour"
 )

@@ -4,7 +4,7 @@ import (
 	"io"
 	"time"
 
-	"bitbucket.org/jonathanoliver/docpile/events"
+	"bitbucket.org/jonathanoliver/docpile/app/events"
 )
 
 type AddTag struct {

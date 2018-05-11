@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"strings"
 
-	"bitbucket.org/jonathanoliver/docpile/events"
+	"bitbucket.org/jonathanoliver/docpile/app/events"
 	"bitbucket.org/jonathanoliver/docpile/library"
 	"bitbucket.org/jonathanoliver/docpile/library/identity"
 	"github.com/smartystreets/clock"

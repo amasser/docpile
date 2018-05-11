@@ -5,9 +5,9 @@ import (
 	"log"
 	stdhttp "net/http"
 
-	"bitbucket.org/jonathanoliver/docpile/domain"
-	"bitbucket.org/jonathanoliver/docpile/events"
-	"bitbucket.org/jonathanoliver/docpile/http"
+	"bitbucket.org/jonathanoliver/docpile/app/domain"
+	"bitbucket.org/jonathanoliver/docpile/app/events"
+	"bitbucket.org/jonathanoliver/docpile/app/http"
 	"bitbucket.org/jonathanoliver/docpile/library"
 	"bitbucket.org/jonathanoliver/docpile/library/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/library/handlers"
