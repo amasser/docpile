@@ -56,15 +56,3 @@ type DocumentDefined struct {
 	Documents   []uint64   `json:"documents,omitempty"`
 	Description string     `json:"description,omitempty"`
 }
-
-func init() {
-	MessageRegistry.Register("tag-added", TagAdded{})
-	MessageRegistry.Register("tag-removed", TagRenamed{})
-	MessageRegistry.Register("tag-synonym-defined", TagSynonymDefined{})
-	MessageRegistry.Register("tag-synonym-removed", TagSynonymRemoved{})
-	MessageRegistry.Register("managed-asset-imported", ManagedAssetImported{})
-	MessageRegistry.Register("cloud-asset-imported", CloudAssetImported{})
-	MessageRegistry.Register("document-defined", DocumentDefined{})
-}
-
-var MessageRegistry = NewRegistry()

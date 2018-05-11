@@ -7,9 +7,9 @@ import (
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/events"
+	"bitbucket.org/jonathanoliver/docpile/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/http"
 	"bitbucket.org/jonathanoliver/docpile/serialization"
-	"bitbucket.org/jonathanoliver/docpile/storage/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/storage/local"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
@@ -32,11 +32,16 @@ TODOs
 const workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
 
 func main() {
-	store := eventstore.New(
-		local.New(workspacePath).Append(),
-		events.MessageRegistry,
-		serialization.JSON())
+	var registry = eventstore.NewRegistry().PanicWhenNotFound()
+	registry.Add("tag-added", events.TagAdded{})
+	registry.Add("tag-removed", events.TagRenamed{})
+	registry.Add("tag-synonym-defined", events.TagSynonymDefined{})
+	registry.Add("tag-synonym-removed", events.TagSynonymRemoved{})
+	registry.Add("managed-asset-imported", events.ManagedAssetImported{})
+	registry.Add("cloud-asset-imported", events.CloudAssetImported{})
+	registry.Add("document-defined", events.DocumentDefined{})
 
+	store := eventstore.New(local.New(workspacePath).Append(), registry, serialization.JSON())
 	aggregate := domain.NewAggregate(domain.NewEpochGenerator())
 	for message := range store.Load() {
 		aggregate.Apply(message)
