@@ -1,5 +1,10 @@
 package infrastructure
 
+type Aggregate interface {
+	Handler
+	Consume() []interface{}
+}
+
 type Handler interface {
 	Handle(interface{}) Result
 }

@@ -38,6 +38,32 @@ func NewAggregate(identity identity.Generator) *Aggregate {
 	}
 }
 
+func (this *Aggregate) Handle(message interface{}) infrastructure.Result {
+	switch message := message.(type) {
+
+	case AddTag:
+		return this.AddTag(message.Name)
+	case RenameTag:
+		return this.RenameTag(message.ID, message.Name)
+	case DefineTagSynonym:
+		return this.DefineTagSynonym(message.ID, message.Name)
+	case RemoveTagSynonym:
+		return this.RemoveTagSynonym(message.ID, message.Name)
+
+	case ImportManagedAsset:
+		return this.ImportManagedAsset(message.Name, message.MIMEType, message.Hash)
+	case ImportCloudAsset:
+		return this.ImportCloudAsset(message.Name, message.Provider, message.Resource)
+
+	case DefineDocument:
+		return this.DefineDocument(message.Document)
+
+	default:
+		log.Panicf(fmt.Sprintf("Aggregate cannot handle '%s'", reflect.TypeOf(message)))
+		return newResult(0, nil)
+	}
+}
+
 func (this *Aggregate) AddTag(name string) infrastructure.Result {
 	if id, contains := this.tagsByNormalizedName[normalizeTag(name)]; contains {
 		return newResult(id, TagAlreadyExistsError)

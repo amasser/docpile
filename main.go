@@ -56,7 +56,7 @@ func main() {
 	var applicator infrastructure.Applicator = &Applicator{}
 	applicator = eventstore.NewApplicator(applicator, store)
 
-	var handler infrastructure.Handler = domain.NewCommandHandler(aggregate, applicator)
+	var handler infrastructure.Handler = domain.NewHandler(aggregate, applicator)
 	handler = domain.NewWriteAssetHandler(handler, storage.NewFileStorage(workspacePath))
 
 	tagController := http.NewTagWriteController(handler)
