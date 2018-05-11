@@ -1,4 +1,4 @@
-package local
+package domain
 
 import (
 	"bytes"
@@ -8,29 +8,28 @@ import (
 	"io/ioutil"
 	"path"
 
-	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/events"
 	"bitbucket.org/jonathanoliver/docpile/storage"
 )
 
-type Handler struct {
-	inner  domain.Handler
+type WriteAssetHandler struct {
+	inner  Handler
 	writer storage.Writer
 }
 
-func NewHandler(inner domain.Handler, writer storage.Writer) *Handler {
-	return &Handler{inner: inner, writer: writer}
+func NewWriteAssetHandler(inner Handler, writer storage.Writer) *WriteAssetHandler {
+	return &WriteAssetHandler{inner: inner, writer: writer}
 }
 
-func (this *Handler) Handle(message interface{}) (uint64, error) {
+func (this *WriteAssetHandler) Handle(message interface{}) (uint64, error) {
 	switch message := message.(type) {
-	case domain.ImportManagedStreamingAsset:
+	case ImportManagedStreamingAsset:
 		return this.handle(message)
 	default:
 		return this.inner.Handle(message)
 	}
 }
-func (this *Handler) handle(message domain.ImportManagedStreamingAsset) (uint64, error) {
+func (this *WriteAssetHandler) handle(message ImportManagedStreamingAsset) (uint64, error) {
 	buffer, err := bufferStream(message.Size, message.Body)
 	if err != nil {
 		return 0, err
@@ -48,14 +47,14 @@ func (this *Handler) handle(message domain.ImportManagedStreamingAsset) (uint64,
 	return id, nil
 }
 
-func (this *Handler) sendMessage(name, mime string, buffer *bytes.Buffer) (uint64, error) {
-	return this.inner.Handle(domain.ImportManagedAsset{
+func (this *WriteAssetHandler) sendMessage(name, mime string, buffer *bytes.Buffer) (uint64, error) {
+	return this.inner.Handle(ImportManagedAsset{
 		Name:     name,
 		MIMEType: mime,
 		Hash:     computeHash(buffer),
 	})
 }
-func (this *Handler) writeBuffer(id uint64, name string, buffer *bytes.Buffer) error {
+func (this *WriteAssetHandler) writeBuffer(id uint64, name string, buffer *bytes.Buffer) error {
 	filename := fmt.Sprintf("%d%s", id, path.Ext(name))
 	source := ioutil.NopCloser(buffer)
 	return this.writer.Write(filename, source)

@@ -19,7 +19,7 @@ func NewRegistry() *Registry {
 	}
 }
 func (this *Registry) PanicWhenNotFound() *Registry {
-	this.panic = true
+	this.panic = true // TODO: "functional options" pattern...
 	return this
 }
 

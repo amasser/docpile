@@ -20,7 +20,7 @@ type DelimitedText struct {
 	serializer serialization.Serializer
 }
 
-func New(store storage.ReadWriter, registry TypeRegistry, serializer serialization.Serializer) *DelimitedText {
+func NewDelimitedText(store storage.ReadWriter, registry TypeRegistry, serializer serialization.Serializer) *DelimitedText {
 	return &DelimitedText{
 		filename:   defaultFilename,
 		store:      store,

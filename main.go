@@ -10,7 +10,7 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/http"
 	"bitbucket.org/jonathanoliver/docpile/serialization"
-	"bitbucket.org/jonathanoliver/docpile/storage/local"
+	"bitbucket.org/jonathanoliver/docpile/storage"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
 )
@@ -41,8 +41,12 @@ func main() {
 	registry.Add("cloud-asset-imported", events.CloudAssetImported{})
 	registry.Add("document-defined", events.DocumentDefined{})
 
-	store := eventstore.New(local.New(workspacePath).Append(), registry, serialization.JSON())
 	aggregate := domain.NewAggregate(domain.NewEpochGenerator())
+	store := eventstore.NewDelimitedText(
+		storage.NewFileStorage(workspacePath).Append(),
+		registry,
+		serialization.NewJSONSerializer())
+
 	for message := range store.Load() {
 		aggregate.Apply(message)
 	}
@@ -54,7 +58,7 @@ func main() {
 
 	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator)
 	handler = domain.NewChannelHandler(handler).Start()
-	handler = local.NewHandler(handler, local.New(workspacePath))
+	handler = domain.NewWriteAssetHandler(handler, storage.NewFileStorage(workspacePath))
 
 	tagController := http.NewTagWriteController(handler)
 	assetController := http.NewAssetWriteController(handler)

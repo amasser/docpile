@@ -7,7 +7,7 @@ import (
 
 type JSONSerializer struct{}
 
-func JSON() *JSONSerializer {
+func NewJSONSerializer() *JSONSerializer {
 	return &JSONSerializer{}
 }
 
