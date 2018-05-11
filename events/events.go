@@ -74,7 +74,7 @@ func init() {
 }
 func registerType(name string, instance interface{}) {
 	instanceType := reflect.TypeOf(instance)
-	registry[instanceType.Name()] = instanceType
+	registry[name] = instanceType
 }
 func InstanceRegistry(name string) reflect.Type {
 	if registeredType, contains := registry[name]; contains {
