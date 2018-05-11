@@ -29,4 +29,4 @@ func (this *Channel) Apply(messages []interface{}) {
 
 type ChannelOption func(*Channel)
 
-func Start() ChannelOption { return func(this *Channel) { go this.Listen() } }
+func StartChannel() ChannelOption { return func(this *Channel) { go this.Listen() } }

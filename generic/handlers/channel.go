@@ -33,7 +33,7 @@ func (this *Channel) Listen() {
 
 type ChannelOption func(*Channel)
 
-func Start() ChannelOption { return func(this *Channel) { go this.Listen() } }
+func StartChannel() ChannelOption { return func(this *Channel) { go this.Listen() } }
 
 ////////////////////////////////////////////////////////
 
