@@ -8,7 +8,9 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/events"
 	"bitbucket.org/jonathanoliver/docpile/http"
-	"bitbucket.org/jonathanoliver/docpile/storage"
+	"bitbucket.org/jonathanoliver/docpile/storage/eventstore"
+	"bitbucket.org/jonathanoliver/docpile/storage/local"
+	"bitbucket.org/jonathanoliver/docpile/storage/serialization"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
 )
@@ -30,10 +32,10 @@ TODOs
 const workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
 
 func main() {
-	store := storage.NewTextEventStore(
-		storage.NewLocalStorage(workspacePath).Append(),
+	store := eventstore.New(
+		local.New(workspacePath).Append(),
 		events.MessageRegistry,
-		storage.NewJSONSerializer())
+		serialization.New())
 
 	aggregate := domain.NewAggregate(domain.NewEpochGenerator())
 	for message := range store.Load() {
@@ -47,7 +49,7 @@ func main() {
 
 	var handler domain.Handler = domain.NewMessageHandler(aggregate, applicator)
 	handler = domain.NewChannelHandler(handler).Start()
-	handler = storage.NewLocalStorageHandler(handler, storage.NewLocalStorage(workspacePath))
+	handler = local.NewHandler(handler, local.New(workspacePath))
 
 	tagController := http.NewTagWriteController(handler)
 	assetController := http.NewAssetWriteController(handler)

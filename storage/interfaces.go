@@ -3,8 +3,14 @@ package storage
 import (
 	"io"
 	"os"
-	"reflect"
 )
+
+type Serializer interface {
+	Serialize(interface{}, io.Writer) error
+	Deserialize(io.Reader, interface{}) error
+}
+
+/////////////////////////////////////////////////////
 
 type Reader interface {
 	Read(string) (io.ReadCloser, error)
@@ -22,12 +28,4 @@ type ReadWriter interface {
 
 var NotFoundError = os.ErrNotExist
 
-type Registry interface {
-	Name(reflect.Type) (string, error)
-	Type(string) (reflect.Type, error)
-}
-
-type Serializer interface {
-	Serialize(interface{}, io.Writer) error
-	Deserialize(io.Reader, interface{}) error
-}
+/////////////////////////////////////////////////////

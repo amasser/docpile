@@ -1,4 +1,4 @@
-package storage
+package local
 
 import (
 	"bytes"
@@ -10,26 +10,27 @@ import (
 
 	"bitbucket.org/jonathanoliver/docpile/domain"
 	"bitbucket.org/jonathanoliver/docpile/events"
+	"bitbucket.org/jonathanoliver/docpile/storage"
 )
 
-type LocalStorageHandler struct {
+type Handler struct {
 	inner  domain.Handler
-	writer Writer
+	writer storage.Writer
 }
 
-func NewLocalStorageHandler(inner domain.Handler, writer Writer) *LocalStorageHandler {
-	return &LocalStorageHandler{inner: inner, writer: writer}
+func NewHandler(inner domain.Handler, writer storage.Writer) *Handler {
+	return &Handler{inner: inner, writer: writer}
 }
 
-func (this *LocalStorageHandler) Handle(message interface{}) (uint64, error) {
+func (this *Handler) Handle(message interface{}) (uint64, error) {
 	switch message := message.(type) {
 	case domain.ImportManagedStreamingAsset:
-		return this.handleImportManagedStreamingAsset(message)
+		return this.handle(message)
 	default:
 		return this.inner.Handle(message)
 	}
 }
-func (this *LocalStorageHandler) handleImportManagedStreamingAsset(message domain.ImportManagedStreamingAsset) (uint64, error) {
+func (this *Handler) handle(message domain.ImportManagedStreamingAsset) (uint64, error) {
 	buffer, err := bufferStream(message.Size, message.Body)
 	if err != nil {
 		return 0, err
@@ -47,14 +48,14 @@ func (this *LocalStorageHandler) handleImportManagedStreamingAsset(message domai
 	return id, nil
 }
 
-func (this *LocalStorageHandler) sendMessage(name, mime string, buffer *bytes.Buffer) (uint64, error) {
-	return this.Handle(domain.ImportManagedAsset{
+func (this *Handler) sendMessage(name, mime string, buffer *bytes.Buffer) (uint64, error) {
+	return this.inner.Handle(domain.ImportManagedAsset{
 		Name:     name,
 		MIMEType: mime,
 		Hash:     computeHash(buffer),
 	})
 }
-func (this *LocalStorageHandler) writeBuffer(id uint64, name string, buffer *bytes.Buffer) error {
+func (this *Handler) writeBuffer(id uint64, name string, buffer *bytes.Buffer) error {
 	filename := fmt.Sprintf("%d%s", id, path.Ext(name))
 	source := ioutil.NopCloser(buffer)
 	return this.writer.Write(filename, source)
