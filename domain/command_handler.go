@@ -8,16 +8,16 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/infrastructure"
 )
 
-type MessageHandler struct {
+type CommandHandler struct {
 	root       *Aggregate
 	applicator infrastructure.Applicator
 }
 
-func NewMessageHandler(root *Aggregate, applicator infrastructure.Applicator) *MessageHandler {
-	return &MessageHandler{root: root, applicator: applicator}
+func NewCommandHandler(root *Aggregate, applicator infrastructure.Applicator) *CommandHandler {
+	return &CommandHandler{root: root, applicator: applicator}
 }
 
-func (this *MessageHandler) Handle(message interface{}) (uint64, error) {
+func (this *CommandHandler) Handle(message interface{}) (uint64, error) {
 	if id, err := this.handle(message); err != nil {
 		return 0, err
 	} else {
@@ -25,7 +25,7 @@ func (this *MessageHandler) Handle(message interface{}) (uint64, error) {
 		return id, nil
 	}
 }
-func (this *MessageHandler) handle(message interface{}) (uint64, error) {
+func (this *CommandHandler) handle(message interface{}) (uint64, error) {
 	switch message := message.(type) {
 
 	case AddTag:
@@ -46,7 +46,7 @@ func (this *MessageHandler) handle(message interface{}) (uint64, error) {
 		return this.root.DefineDocument(message.Document)
 
 	default:
-		log.Panicf(fmt.Sprintf("MessageHandler cannot handle '%s'", reflect.TypeOf(message)))
+		log.Panicf(fmt.Sprintf("CommandHandler cannot handle '%s'", reflect.TypeOf(message)))
 	}
 
 	return 0, nil

@@ -19,8 +19,8 @@ type Aggregate struct {
 	tagsByID             map[uint64]string
 	tagsByNormalizedName map[string]uint64
 	assetsByID           map[uint64]struct{}
-	managedAssets        map[managedKey]uint64
-	cloudAssets          map[cloudKey]struct{}
+	managedAssets        map[events.SHA256Hash]uint64
+	cloudAssets          map[string]struct{}
 	documentsByID        map[uint64]struct{}
 }
 
@@ -30,8 +30,8 @@ func NewAggregate(identity identity.Generator) *Aggregate {
 		tagsByID:             make(map[uint64]string),
 		tagsByNormalizedName: make(map[string]uint64),
 		assetsByID:           make(map[uint64]struct{}),
-		managedAssets:        make(map[managedKey]uint64),
-		cloudAssets:          make(map[cloudKey]struct{}),
+		managedAssets:        make(map[events.SHA256Hash]uint64),
+		cloudAssets:          make(map[string]struct{}),
 		documentsByID:        make(map[uint64]struct{}),
 	}
 }
@@ -96,7 +96,7 @@ func normalizeTag(value string) string {
 }
 
 func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256Hash) (uint64, error) {
-	if id, contains := this.managedAssets[managedKey(hash)]; contains {
+	if id, contains := this.managedAssets[hash]; contains {
 		return id, AssetAlreadyExistsError
 	}
 
@@ -111,7 +111,7 @@ func (this *Aggregate) ImportManagedAsset(name, mime string, hash events.SHA256H
 	})
 }
 func (this *Aggregate) ImportCloudAsset(name, provider, resource string) (uint64, error) {
-	if _, contains := this.cloudAssets[newCloudAssetKey(provider, resource)]; contains {
+	if _, contains := this.cloudAssets[normalizeCloudAsset(provider, resource)]; contains {
 		return 0, AssetAlreadyExistsError
 	}
 
@@ -123,6 +123,9 @@ func (this *Aggregate) ImportCloudAsset(name, provider, resource string) (uint64
 		Provider:  provider,
 		Resource:  resource,
 	})
+}
+func normalizeCloudAsset(provider, resource string) string {
+	return fmt.Sprintf("%s.%s", strings.ToLower(provider), resource)
 }
 
 func (this *Aggregate) DefineDocument(doc DocumentDefinition) (uint64, error) {
@@ -218,11 +221,11 @@ func (this *Aggregate) applyTagSynonymRemoved(message events.TagSynonymRemoved) 
 
 func (this *Aggregate) applyManagedAssetImported(message events.ManagedAssetImported) {
 	this.assetsByID[message.AssetID] = struct{}{}
-	this.managedAssets[managedKey(message.Hash)] = message.AssetID
+	this.managedAssets[message.Hash] = message.AssetID
 }
 func (this *Aggregate) applyCloudAssetImported(message events.CloudAssetImported) {
 	this.assetsByID[message.AssetID] = struct{}{}
-	this.cloudAssets[newCloudAssetKey(message.Provider, message.Resource)] = struct{}{}
+	this.cloudAssets[normalizeCloudAsset(message.Provider, message.Resource)] = struct{}{}
 }
 
 func (this *Aggregate) applyDocumentDefined(message events.DocumentDefined) {
