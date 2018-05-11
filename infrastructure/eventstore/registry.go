@@ -12,14 +12,16 @@ type Registry struct {
 	panic      bool
 }
 
-func NewRegistry() *Registry {
-	return &Registry{
+func NewRegistry(options ...RegistryOption) *Registry {
+	this := &Registry{
 		nameToType: map[string]reflect.Type{},
 		typeToName: map[reflect.Type]string{},
 	}
-}
-func (this *Registry) PanicWhenNotFound() *Registry {
-	this.panic = true // TODO: "functional options" pattern...
+
+	for _, option := range options {
+		option(this)
+	}
+
 	return this
 }
 
@@ -50,3 +52,9 @@ func (this *Registry) Type(typeName string) (reflect.Type, error) {
 }
 
 var typeNotFound = errors.New("requested type not found")
+
+///////////////////////////////////////////////////////
+
+type RegistryOption func(this *Registry)
+
+func PanicOnUnknownType() RegistryOption { return func(this *Registry) { this.panic = true } }

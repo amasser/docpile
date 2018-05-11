@@ -34,7 +34,7 @@ TODOs
 const workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
 
 func main() {
-	var registry = eventstore.NewRegistry().PanicWhenNotFound()
+	var registry = eventstore.NewRegistry(eventstore.PanicOnUnknownType())
 	registry.Add("tag-added", events.TagAdded{})
 	registry.Add("tag-removed", events.TagRenamed{})
 	registry.Add("tag-synonym-defined", events.TagSynonymDefined{})
@@ -45,7 +45,7 @@ func main() {
 
 	aggregate := domain.NewAggregate(identity.NewEpochGenerator())
 	store := eventstore.NewDelimitedText(
-		storage.NewFileStorage(workspacePath).Append(),
+		storage.NewFileStorage(workspacePath, storage.Append(), storage.EnsureWorkspace()),
 		registry,
 		serialization.NewJSONSerializer())
 

@@ -12,24 +12,18 @@ type FileStorage struct {
 	writeFlags int
 }
 
-func NewFileStorage(workspace string) *FileStorage {
-	this := &FileStorage{
-		workspace:  workspace,
-		writeFlags: os.O_CREATE | os.O_WRONLY,
-	}
-
-	this.ensureWorkspace() // TODO: functional options
-
-	return this
-}
-func (this *FileStorage) ensureWorkspace() {
-	if len(this.workspace) == 0 {
+func NewFileStorage(workspace string, options ...FileOption) *FileStorage {
+	if len(workspace) == 0 {
 		panic("workspace is required")
 	}
 
-	if err := os.MkdirAll(this.workspace, 0755); err != nil {
-		panic(err)
+	this := &FileStorage{workspace: workspace, writeFlags: os.O_CREATE | os.O_WRONLY}
+
+	for _, option := range options {
+		option(this)
 	}
+
+	return this
 }
 func (this *FileStorage) composeFilename(key string) string {
 	key = strings.TrimSpace(key)
@@ -37,10 +31,6 @@ func (this *FileStorage) composeFilename(key string) string {
 		panic("key is required")
 	}
 	return path.Join(this.workspace, key)
-}
-func (this *FileStorage) Append() *FileStorage {
-	this.writeFlags |= os.O_APPEND // TODO: functional options
-	return this
 }
 
 func (this *FileStorage) Read(key string) (io.ReadCloser, error) {
@@ -69,3 +59,14 @@ func (this *FileStorage) write(source io.ReadCloser, destination io.WriteCloser)
 	_, err := io.CopyBuffer(destination, source, buffer[:])
 	return err
 }
+
+func (this *FileStorage) ensureWorkspace() {
+	if err := os.MkdirAll(this.workspace, 0755); err != nil {
+		panic(err)
+	}
+}
+
+type FileOption func(*FileStorage)
+
+func Append() FileOption          { return func(this *FileStorage) { this.writeFlags |= os.O_APPEND } }
+func EnsureWorkspace() FileOption { return func(this *FileStorage) { this.ensureWorkspace() } }
