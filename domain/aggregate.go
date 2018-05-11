@@ -240,6 +240,10 @@ func (this *Aggregate) Consume() []interface{} {
 	return consumed
 }
 
+func newResult(id uint64, err error) infrastructure.Result {
+	return infrastructure.Result{ID: id, Error: err}
+}
+
 var (
 	TagAlreadyExistsError   = errors.New("tag already exists")
 	AssetAlreadyExistsError = errors.New("asset already exists")
