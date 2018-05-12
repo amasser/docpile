@@ -1,5 +1,5 @@
 TODOs
-- EventStore: event-per || remove line breaks from user text input || base64 encode JSON
+- EventStore: event-per file || remove line breaks from user text input || base64 encode JSON
 
 - apply/remove tags from documents
 - delete document
