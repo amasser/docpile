@@ -82,7 +82,9 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	router.Handler("PUT", "/documents", this.newWriter(documentWriter.Define))
 
 	router.Handler("GET", "/tags", this.newReader(reader.ListTags))
+	router.Handler("GET", "/tags/:id", this.newReader(reader.LoadTag))
 	router.Handler("GET", "/documents", this.newReader(reader.ListDocuments))
+	router.Handler("GET", "/documents/:id", this.newReader(reader.LoadDocument))
 
 	return router
 

@@ -1,6 +1,9 @@
 package http
 
-import "github.com/smartystreets/detour"
+import (
+	"bitbucket.org/jonathanoliver/docpile/app/http/inputs"
+	"github.com/smartystreets/detour"
+)
 
 type Reader struct {
 	reader projectionReader
@@ -17,7 +20,20 @@ func (this *Reader) ListDocuments() detour.Renderer {
 	return detour.JSONResult{Content: this.reader.ListDocuments()}
 }
 
-// TODO: load ID input model (read path)
+func (this *Reader) LoadTag(input *inputs.LoadID) detour.Renderer {
+	return this.render(this.reader.LoadTag(input.ID))
+}
+func (this *Reader) LoadDocument(input *inputs.LoadID) detour.Renderer {
+	return this.render(this.reader.LoadDocument(input.ID))
+}
+func (this *Reader) render(value interface{}, err error) detour.Renderer {
+	if err != nil {
+		return inputs.IDNotFoundResult
+	} else {
+		return detour.JSONResult{Content: value}
+	}
+}
+
 type projectionReader interface {
 	ListTags() interface{}
 	LoadTag(uint64) (interface{}, error)

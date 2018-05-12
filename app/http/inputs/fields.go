@@ -5,6 +5,10 @@ const (
 )
 
 const (
+	urlIDField = "id"
+)
+
+const (
 	jsonTagIDField       = "tag_id"
 	jsonTagsField        = "tags"
 	jsonNameField        = "name"
