@@ -8,7 +8,7 @@ import (
 	"github.com/smartystreets/detour"
 )
 
-type DocumentSearch struct {
+type SearchDocument struct {
 	PublishedMin *time.Time `json:"published_min"`
 	PublishedMax *time.Time `json:"published_max"`
 	PeriodMin    *time.Time `json:"period_min"`
@@ -16,17 +16,17 @@ type DocumentSearch struct {
 	Tags         []uint64   `json:"tags"`
 }
 
-func (this *DocumentSearch) Bind(request *http.Request) error {
+func (this *SearchDocument) Bind(request *http.Request) error {
 	return json.NewDecoder(request.Body).Decode(this)
 }
 
-func (this *DocumentSearch) Validate() error {
+func (this *SearchDocument) Validate() error {
 	var errors detour.Errors
 	errors = errors.AppendIf(duplicateTagError, containsDuplicate(this.Tags))
 	errors = errors.AppendIf(noDocumentSearchCriteria, this.emptySearch())
 	return errors
 }
-func (this *DocumentSearch) emptySearch() bool {
+func (this *SearchDocument) emptySearch() bool {
 	return this.PublishedMin == nil && this.PublishedMax == nil &&
 		this.PeriodMin == nil && this.PeriodMax == nil &&
 		len(this.Tags) == 0
