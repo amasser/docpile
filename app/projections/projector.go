@@ -26,3 +26,15 @@ func (this *Projector) ListTags() interface{}                       { return thi
 func (this *Projector) LoadTag(id uint64) (interface{}, error)      { return this.allTags.Load(id) }
 func (this *Projector) ListDocuments() interface{}                  { return this.allDocuments.List() }
 func (this *Projector) LoadDocument(id uint64) (interface{}, error) { return this.allDocuments.Load(id) }
+
+func (this *Projector) SearchDocuments(search DocumentSpecification) interface{} {
+	var documents []Document
+
+	for _, document := range this.allDocuments.List() {
+		if search.IsSatisfiedBy(document) {
+			documents = append(documents, document)
+		}
+	}
+
+	return documents
+}
