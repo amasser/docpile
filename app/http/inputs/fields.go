@@ -18,4 +18,5 @@ const (
 	jsonPublishedMinField = "published_min"
 	jsonPublishedMaxField = "published_max"
 	jsonDocumentsField    = "documents"
+	jsonTextField         = "text"
 )
