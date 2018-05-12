@@ -71,6 +71,7 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	assetWriter := http.NewAssetWriter(application)
 	documentWriter := http.NewDocumentWriter(application)
 	reader := http.NewReader(projector)
+	search := http.NewSearch(projector)
 
 	router := buildRouter()
 	router.Handler("PUT", "/tags", this.writerAction(tagWriter.Add))
@@ -86,10 +87,10 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	router.Handler("GET", "/documents", this.readerAction(reader.ListDocuments))
 	router.Handler("GET", "/documents/:id", this.readerAction(reader.LoadDocument))
 
-	return router
+	router.Handler("POST", "/search/documents", this.readerAction(search.Documents))
+	router.Handler("POST", "/search/tags", this.readerAction(search.Tags))
 
-	// GET /search/documents = document search criteria
-	// GET /search/tags = tag auto-complete search
+	return router
 
 	// apply/remove one or more tags to a single document
 	//   PUT /documents/:id/tags
