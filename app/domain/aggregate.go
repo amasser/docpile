@@ -96,7 +96,7 @@ func (this *Aggregate) DefineTagSynonym(id uint64, name string) handlers.Result 
 	return this.raise(id, events.TagSynonymDefined{
 		TagID:     id,
 		Timestamp: this.clock.UTCNow(),
-		TagName:   name,
+		Synonym:   name,
 	})
 }
 func (this *Aggregate) RemoveTagSynonym(id uint64, name string) handlers.Result {
@@ -107,7 +107,7 @@ func (this *Aggregate) RemoveTagSynonym(id uint64, name string) handlers.Result 
 	return this.raise(id, events.TagSynonymRemoved{
 		TagID:     id,
 		Timestamp: this.clock.UTCNow(),
-		TagName:   name,
+		Synonym:   name,
 	})
 }
 func (this *Aggregate) validTagInput(id uint64, name string) handlers.Result {
@@ -241,10 +241,10 @@ func (this *Aggregate) applyTagRenamed(message events.TagRenamed) {
 	this.tagsByNormalizedName[normalizeTag(message.NewName)] = message.TagID
 }
 func (this *Aggregate) applyTagSynonymDefined(message events.TagSynonymDefined) {
-	this.tagsByNormalizedName[normalizeTag(message.TagName)] = message.TagID
+	this.tagsByNormalizedName[normalizeTag(message.Synonym)] = message.TagID
 }
 func (this *Aggregate) applyTagSynonymRemoved(message events.TagSynonymRemoved) {
-	delete(this.tagsByNormalizedName, normalizeTag(message.TagName))
+	delete(this.tagsByNormalizedName, normalizeTag(message.Synonym))
 }
 
 func (this *Aggregate) applyManagedAssetImported(message events.ManagedAssetImported) {

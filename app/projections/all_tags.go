@@ -39,10 +39,10 @@ func (this *AllTags) tagRenamed(message events.TagRenamed) {
 	this.load(message.TagID).TagName = message.NewName
 }
 func (this *AllTags) synonymDefined(message events.TagSynonymDefined) {
-	this.load(message.TagID).Synonyms[message.TagName] = message.Timestamp
+	this.load(message.TagID).Synonyms[message.Synonym] = message.Timestamp
 }
 func (this *AllTags) synonymRemoved(message events.TagSynonymRemoved) {
-	delete(this.load(message.TagID).Synonyms, message.TagName)
+	delete(this.load(message.TagID).Synonyms, message.Synonym)
 }
 
 func (this *AllTags) load(id uint64) *Tag {
