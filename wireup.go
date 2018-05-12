@@ -73,18 +73,18 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	reader := http.NewReader(projector)
 
 	router := buildRouter()
-	router.Handler("PUT", "/tags", this.newWriter(tagWriter.Add))
-	router.Handler("POST", "/tags/name", this.newWriter(tagWriter.Rename))
-	router.Handler("PUT", "/tags/synonym", this.newWriter(tagWriter.DefineSynonym))
-	router.Handler("DELETE", "/tags/synonym", this.newWriter(tagWriter.RemoveSynonym))
+	router.Handler("PUT", "/tags", this.writerAction(tagWriter.Add))
+	router.Handler("POST", "/tags/name", this.writerAction(tagWriter.Rename))
+	router.Handler("PUT", "/tags/synonym", this.writerAction(tagWriter.DefineSynonym))
+	router.Handler("DELETE", "/tags/synonym", this.writerAction(tagWriter.RemoveSynonym))
 
-	router.Handler("PUT", "/assets", this.newWriter(assetWriter.ImportManaged))
-	router.Handler("PUT", "/documents", this.newWriter(documentWriter.Define))
+	router.Handler("PUT", "/assets", this.writerAction(assetWriter.ImportManaged))
+	router.Handler("PUT", "/documents", this.writerAction(documentWriter.Define))
 
-	router.Handler("GET", "/tags", this.newReader(reader.ListTags))
-	router.Handler("GET", "/tags/:id", this.newReader(reader.LoadTag))
-	router.Handler("GET", "/documents", this.newReader(reader.ListDocuments))
-	router.Handler("GET", "/documents/:id", this.newReader(reader.LoadDocument))
+	router.Handler("GET", "/tags", this.readerAction(reader.ListTags))
+	router.Handler("GET", "/tags/:id", this.readerAction(reader.LoadTag))
+	router.Handler("GET", "/documents", this.readerAction(reader.ListDocuments))
+	router.Handler("GET", "/documents/:id", this.readerAction(reader.LoadDocument))
 
 	return router
 
@@ -98,10 +98,10 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	//   PUT /tags/:id/documents
 	//   DELETE /tags/:id/documents/:documents
 }
-func (this *Wireup) newWriter(action interface{}) stdhttp.Handler {
+func (this *Wireup) writerAction(action interface{}) stdhttp.Handler {
 	return detour.New(action)
 }
-func (this *Wireup) newReader(action interface{}) stdhttp.Handler {
+func (this *Wireup) readerAction(action interface{}) stdhttp.Handler {
 	return web.NewLockHandler(this.mutex.RLocker(), detour.New(action))
 }
 
