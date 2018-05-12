@@ -87,6 +87,7 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	router.Handler("GET", "/documents", this.readerAction(reader.ListDocuments))
 	router.Handler("GET", "/documents/:id", this.readerAction(reader.LoadDocument))
 
+	// these methods don't mutate, but binding is easier after JSON decoding the request body.
 	router.Handler("POST", "/search/documents", this.readerAction(search.Documents))
 	router.Handler("POST", "/search/tags", this.readerAction(search.Tags))
 
