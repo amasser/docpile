@@ -27,9 +27,9 @@ func NewDocumentSearch(
 }
 
 func (this *DocumentSearch) IsSatisfiedBy(document Document) bool {
-	// TODO: period min/max
 	return this.withinPublishedLimits(document.Published) &&
-		documentContainsAllSearchTags(this.tags, document.Tags)
+		this.withinPeriodLimits(document.PeriodMin, document.PeriodMax) &&
+		this.containsAllSearchTags(document.Tags)
 }
 
 func (this *DocumentSearch) withinPublishedLimits(published *time.Time) bool {
@@ -48,8 +48,24 @@ func (this *DocumentSearch) withinPublishedLimits(published *time.Time) bool {
 	return true
 }
 
-func documentContainsAllSearchTags(searchTags, documentTags []uint64) bool {
-	for _, searchTag := range searchTags {
+func (this *DocumentSearch) withinPeriodLimits(min, max *time.Time) bool {
+	if min == nil && max == nil {
+		return true
+	}
+
+	if min != nil && this.periodMin != nil && this.periodMin.After(*min) {
+		return false
+	}
+
+	if max != nil && this.periodMin != nil && this.periodMax.Before(*max) {
+		return false
+	}
+
+	return true
+}
+
+func (this *DocumentSearch) containsAllSearchTags(documentTags []uint64) bool {
+	for _, searchTag := range this.tags {
 		if !documentTagsContainSearchTag(searchTag, documentTags) {
 			return false
 		}
