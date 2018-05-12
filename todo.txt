@@ -5,7 +5,6 @@ TODOs
 - delete document
 - update document description/published date/effective dates
 
-- document search
 - tag search (including partial text match)
 - during document search, as combinations of tags are specified,
     only the remaining intersection of tags is suggested
