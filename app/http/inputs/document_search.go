@@ -9,10 +9,10 @@ import (
 )
 
 type DocumentSearch struct {
-	MinPublished *time.Time `json:"published_min"`
-	MaxPublished *time.Time `json:"published_max"`
-	MinPeriod    *time.Time `json:"period_min"`
-	MaxPeriod    *time.Time `json:"period_max"`
+	PublishedMin *time.Time `json:"published_min"`
+	PublishedMax *time.Time `json:"published_max"`
+	PeriodMin    *time.Time `json:"period_min"`
+	PeriodMax    *time.Time `json:"period_max"`
 	Tags         []uint64   `json:"tags"`
 }
 
@@ -27,8 +27,8 @@ func (this *DocumentSearch) Validate() error {
 	return errors
 }
 func (this *DocumentSearch) emptySearch() bool {
-	return this.MinPublished == nil && this.MaxPublished == nil &&
-		this.MinPeriod == nil && this.MaxPeriod == nil &&
+	return this.PublishedMin == nil && this.PublishedMax == nil &&
+		this.PeriodMin == nil && this.PeriodMax == nil &&
 		len(this.Tags) == 0
 }
 

@@ -49,8 +49,8 @@ type DocumentDefined struct {
 	AssetID     uint64     `json:"asset_id"`
 	AssetOffset uint64     `json:"asset_offset,omitempty"`
 	Published   *time.Time `json:"published,omitempty"`
-	PeriodBegin *time.Time `json:"begin,omitempty"`
-	PeriodEnd   *time.Time `json:"end,omitempty"`
+	PeriodMin   *time.Time `json:"period_min,omitempty"`
+	PeriodMax   *time.Time `json:"period_max,omitempty"`
 	Tags        []uint64   `json:"tags,omitempty"`
 	Documents   []uint64   `json:"documents,omitempty"`
 	Description string     `json:"description,omitempty"`

@@ -168,8 +168,8 @@ func (this *Aggregate) DefineDocument(doc DocumentDefinition) handlers.Result {
 		AssetID:     doc.AssetID,
 		AssetOffset: doc.AssetOffset,
 		Published:   doc.Published,
-		PeriodBegin: doc.PeriodBegin,
-		PeriodEnd:   doc.PeriodEnd,
+		PeriodMin:   doc.PeriodMin,
+		PeriodMax:   doc.PeriodMax,
 		Tags:        doc.Tags,
 		Documents:   doc.Documents,
 		Description: doc.Description,
@@ -192,7 +192,7 @@ func (this *Aggregate) validDefinition(doc DocumentDefinition) error {
 		}
 	}
 
-	// FUTURE: other invariants, e.g. begin after end, end without begin
+	// FUTURE: other invariants, e.g. min after max, max without min
 	return nil
 }
 

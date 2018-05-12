@@ -13,8 +13,8 @@ type DefineDocument struct {
 	AssetID     uint64     `json:"asset_id"`
 	AssetOffset uint64     `json:"asset_offset"`
 	Published   *time.Time `json:"published"`
-	PeriodBegin *time.Time `json:"period_begin"`
-	PeriodEnd   *time.Time `json:"period_end"`
+	PeriodMin   *time.Time `json:"period_min"`
+	PeriodMax   *time.Time `json:"period_max"`
 	Tags        []uint64   `json:"tags"`
 	Documents   []uint64   `json:"documents"`
 	Description string     `json:"description"`
@@ -30,9 +30,9 @@ func (this *DefineDocument) Sanitize() {
 
 func (this *DefineDocument) Validate() error {
 	var errors detour.Errors
-	errors = errors.AppendIf(beforeMustComeFirstError,
-		this.PeriodBegin != nil && this.PeriodEnd != nil && this.PeriodBegin.After(*this.PeriodEnd))
-	errors = errors.AppendIf(endMustHaveABeforeError, this.PeriodEnd != nil && this.PeriodBegin == nil)
+	errors = errors.AppendIf(minMustComeFirstError,
+		this.PeriodMin != nil && this.PeriodMax != nil && this.PeriodMin.After(*this.PeriodMax))
+	errors = errors.AppendIf(maxMustHaveAMinError, this.PeriodMax != nil && this.PeriodMin == nil)
 	errors = errors.AppendIf(duplicateTagError, containsDuplicate(this.Tags))
 	errors = errors.AppendIf(duplicateDocumentError, containsDuplicate(this.Documents))
 	return errors
@@ -52,8 +52,8 @@ func containsDuplicate(values []uint64) bool {
 }
 
 var (
-	beforeMustComeFirstError   = fieldError("The begin date must come on or before the end date.", jsonPeriodBeginField, jsonPeriodEndField)
-	endMustHaveABeforeError    = fieldError("When an end date is specified it must have a begin date.", jsonPeriodBeginField, jsonPeriodEndField)
+	minMustComeFirstError      = fieldError("The min/begin date must come on or before the max/end date.", jsonPeriodMinField, jsonPeriodMaxField)
+	maxMustHaveAMinError       = fieldError("When an max/end date is specified it must have a min/begin date.", jsonPeriodMinField, jsonPeriodMaxField)
 	duplicateTagError          = fieldError("The tag IDs provided must be unique.", jsonTagsField)
 	duplicateDocumentError     = fieldError("The document IDs provided must be unique.", jsonDocumentsField)
 	AssetDoesNotExistResult    = notFoundResult("The asset ID supplied could not be found.", jsonAssetIDField)

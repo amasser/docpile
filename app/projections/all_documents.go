@@ -50,8 +50,8 @@ type Document struct {
 	AssetID     uint64     `json:"asset_id"`
 	AssetOffset uint64     `json:"asset_offset,omitempty"`
 	Published   *time.Time `json:"published,omitempty"`
-	PeriodBegin *time.Time `json:"effective_begin,omitempty"`
-	PeriodEnd   *time.Time `json:"effective_end,omitempty"`
+	PeriodMin   *time.Time `json:"period_min,omitempty"`
+	PeriodMax   *time.Time `json:"period_max,omitempty"`
 	Tags        []uint64   `json:"tags,omitempty"`
 	Documents   []uint64   `json:"documents,omitempty"`
 	Description string     `json:"description,omitempty"`
@@ -64,8 +64,8 @@ func newDocument(message events.DocumentDefined) Document {
 		AssetID:     message.AssetID,
 		AssetOffset: message.AssetOffset,
 		Published:   message.Published,
-		PeriodBegin: message.PeriodBegin,
-		PeriodEnd:   message.PeriodEnd,
+		PeriodMin:   message.PeriodMin,
+		PeriodMax:   message.PeriodMax,
 		Tags:        message.Tags,
 		Documents:   message.Documents,
 		Description: message.Description,
