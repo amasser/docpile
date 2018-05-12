@@ -1,6 +1,7 @@
 package projections
 
 import (
+	"errors"
 	"time"
 
 	"bitbucket.org/jonathanoliver/docpile/app/events"
@@ -8,19 +9,11 @@ import (
 
 type AllTags struct {
 	index map[uint64]int
-	tags  []Tag
+	items []Tag
 }
 
 func NewAllTags() *AllTags {
 	return &AllTags{index: map[uint64]int{}}
-}
-
-func (this *AllTags) loadTag(tagID uint64) *Tag {
-	if index, contains := this.index[tagID]; contains {
-		return &this.tags[index]
-	} else {
-		return &Tag{Synonyms: map[string]time.Time{}}
-	}
 }
 
 func (this *AllTags) Transform(message interface{}) {
@@ -38,21 +31,40 @@ func (this *AllTags) Transform(message interface{}) {
 
 func (this *AllTags) tagAdded(message events.TagAdded) {
 	if _, contains := this.index[message.TagID]; !contains {
-		this.tags = append(this.tags, newTag(message))
-		this.index[message.TagID] = len(this.tags) - 1
+		this.index[message.TagID] = len(this.items)
+		this.items = append(this.items, newTag(message))
 	}
 }
 func (this *AllTags) tagRenamed(message events.TagRenamed) {
-	this.loadTag(message.TagID).TagName = message.NewName
+	this.load(message.TagID).TagName = message.NewName
 }
 func (this *AllTags) synonymDefined(message events.TagSynonymDefined) {
-	this.loadTag(message.TagID).Synonyms[message.TagName] = message.Timestamp
+	this.load(message.TagID).Synonyms[message.TagName] = message.Timestamp
 }
 func (this *AllTags) synonymRemoved(message events.TagSynonymRemoved) {
-	delete(this.loadTag(message.TagID).Synonyms, message.TagName)
+	delete(this.load(message.TagID).Synonyms, message.TagName)
 }
 
-func (this *AllTags) List() []Tag { return this.tags }
+func (this *AllTags) load(id uint64) *Tag {
+	if index, contains := this.index[id]; contains {
+		return &this.items[index]
+	} else {
+		return &Tag{Synonyms: map[string]time.Time{}}
+	}
+}
+
+func (this *AllTags) List() []Tag { return this.items }
+func (this *AllTags) Load(id uint64) (Tag, error) {
+	if index, contains := this.index[id]; contains {
+		return this.items[index], nil
+	} else {
+		return Tag{}, TagNotFoundError
+	}
+}
+
+var (
+	TagNotFoundError = errors.New("tag not found")
+)
 
 //////////////////////////////////////////////////////////////
 

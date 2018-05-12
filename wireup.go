@@ -68,9 +68,9 @@ func (this *Wireup) buildApplicator(store eventstore.EventStore, projector *proj
 
 func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *projections.Projector) stdhttp.Handler {
 	tagWriter := http.NewTagWriter(application)
-	tagReader := http.NewTagReader(projector)
 	assetWriter := http.NewAssetWriter(application)
 	documentWriter := http.NewDocumentWriter(application)
+	reader := http.NewReader(projector)
 
 	router := buildRouter()
 	router.Handler("PUT", "/tags", this.newWriter(tagWriter.Add))
@@ -81,7 +81,8 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	router.Handler("PUT", "/assets", this.newWriter(assetWriter.ImportManaged))
 	router.Handler("PUT", "/documents", this.newWriter(documentWriter.Define))
 
-	router.Handler("GET", "/tags", this.newReader(tagReader.List))
+	router.Handler("GET", "/tags", this.newReader(reader.ListTags))
+	router.Handler("GET", "/documents", this.newReader(reader.ListDocuments))
 
 	return router
 
