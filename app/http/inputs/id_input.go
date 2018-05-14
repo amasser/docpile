@@ -8,16 +8,16 @@ import (
 	"github.com/smartystreets/detour"
 )
 
-type LoadID struct {
+type IDInput struct {
 	ID uint64
 }
 
-func (this *LoadID) Bind(request *http.Request) error {
+func (this *IDInput) Bind(request *http.Request) error {
 	this.ID, _ = strconv.ParseUint(path.Base(request.URL.Path), 10, 64)
 	return nil
 }
 
-func (this *LoadID) Validate() error {
+func (this *IDInput) Validate() error {
 	var errors detour.Errors
 	errors = errors.AppendIf(idNotFoundError, this.ID == 0)
 	return errors

@@ -20,10 +20,10 @@ func (this *Reader) ListDocuments() detour.Renderer {
 	return detour.JSONResult{Content: this.reader.ListDocuments()}
 }
 
-func (this *Reader) LoadTag(input *inputs.LoadID) detour.Renderer {
+func (this *Reader) LoadTag(input *inputs.IDInput) detour.Renderer {
 	return this.render(this.reader.LoadTag(input.ID))
 }
-func (this *Reader) LoadDocument(input *inputs.LoadID) detour.Renderer {
+func (this *Reader) LoadDocument(input *inputs.IDInput) detour.Renderer {
 	return this.render(this.reader.LoadDocument(input.ID))
 }
 func (this *Reader) render(value interface{}, err error) detour.Renderer {
