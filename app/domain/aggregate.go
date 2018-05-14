@@ -57,6 +57,8 @@ func (this *Aggregate) Handle(message interface{}) handlers.Result {
 
 	case DefineDocument:
 		return this.DefineDocument(message.Document)
+	case RemoveDocument:
+		return this.RemoveDocument(message.ID)
 
 	default:
 		log.Panicf(fmt.Sprintf("Aggregate cannot handle '%s'", reflect.TypeOf(message)))

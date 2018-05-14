@@ -55,3 +55,7 @@ type DocumentDefinition struct {
 	Documents   []uint64
 	Description string
 }
+
+type RemoveDocument struct {
+	ID uint64
+}
