@@ -5,8 +5,13 @@ TODOs
     PUT /documents/:id/tags
     DELETE /documents/:id/tags
 
-- delete document
-    DELETE /documents/:id
+    (Multiple tags/documents at a time???)
+    apply/remove one or more tags to a single document
+      PUT /documents/:id/tags
+      DELETE /document/:id/tags/:tags
+    apply/remove one tag to one or more documents
+      PUT /tags/:id/documents
+      DELETE /tags/:id/documents/:documents
 
 As a tag is selected, the id is added to the tag search so that:
 1. that tag (and synonyms) are no longer returned in the suggested result set
