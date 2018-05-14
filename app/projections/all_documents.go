@@ -49,15 +49,7 @@ func (this *AllDocuments) documentRemoved(message events.DocumentRemoved) {
 }
 func (this *AllDocuments) tagRemoved(message events.TagRemoved) {
 	for _, document := range this.items {
-		removeTagFromDocument(&document, message.TagID)
-	}
-}
-func removeTagFromDocument(document *Document, tagID uint64) {
-	for i, tag := range document.Tags {
-		if tag == tagID {
-			document.Tags = append(document.Tags[:i], document.Tags[i+1:]...)
-			return
-		}
+		document.removeTag(message.TagID)
 	}
 }
 
@@ -101,5 +93,13 @@ func newDocument(message events.DocumentDefined) Document {
 		Tags:        message.Tags,
 		Documents:   message.Documents,
 		Description: message.Description,
+	}
+}
+func (this *Document) removeTag(tagID uint64) {
+	for i, tag := range this.Tags {
+		if tag == tagID {
+			this.Tags = append(this.Tags[:i], this.Tags[i+1:]...)
+			return
+		}
 	}
 }

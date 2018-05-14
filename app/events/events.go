@@ -66,7 +66,8 @@ type DocumentRemoved struct {
 
 var Types = map[string]interface{}{
 	"tag-added":              TagAdded{},
-	"tag-removed":            TagRenamed{},
+	"tag-removed":            TagRemoved{},
+	"tag-renamed":            TagRenamed{},
 	"tag-synonym-defined":    TagSynonymDefined{},
 	"tag-synonym-removed":    TagSynonymRemoved{},
 	"managed-asset-imported": ManagedAssetImported{},
