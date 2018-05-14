@@ -81,6 +81,7 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 
 	router.Handler("PUT", "/assets", this.writerAction(assetWriter.ImportManaged))
 	router.Handler("PUT", "/documents", this.writerAction(documentWriter.Define))
+	router.Handler("DELETE", "/documents", this.writerAction(documentWriter.Remove))
 
 	router.Handler("GET", "/tags", this.readerAction(reader.ListTags))
 	router.Handler("GET", "/tags/:id", this.readerAction(reader.LoadTag))
