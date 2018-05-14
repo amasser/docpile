@@ -77,8 +77,8 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	router.Handler("PUT", "/tags", this.writerAction(tagWriter.Add))
 	router.Handler("DELETE", "/tags/:id", this.writerAction(tagWriter.Remove))
 	router.Handler("POST", "/tags/:id/name", this.writerAction(tagWriter.Rename))
-	router.Handler("PUT", "/tags/:id/synonym", this.writerAction(tagWriter.DefineSynonym))
-	router.Handler("DELETE", "/tags/:id/synonym", this.writerAction(tagWriter.RemoveSynonym))
+	router.Handler("PUT", "/tags/:id/name", this.writerAction(tagWriter.DefineSynonym))
+	router.Handler("DELETE", "/tags/:id/name", this.writerAction(tagWriter.RemoveSynonym))
 
 	router.Handler("PUT", "/assets", this.writerAction(assetWriter.ImportManaged))
 	router.Handler("PUT", "/documents", this.writerAction(documentWriter.Define))
