@@ -20,6 +20,8 @@ func (this *AllDocuments) Transform(message interface{}) {
 	switch message := message.(type) {
 	case events.DocumentDefined:
 		this.documentDefined(message)
+	case events.DocumentRemoved:
+		this.documentRemoved(message)
 	}
 }
 func (this *AllDocuments) documentDefined(message events.DocumentDefined) {
@@ -27,6 +29,21 @@ func (this *AllDocuments) documentDefined(message events.DocumentDefined) {
 		this.index[message.DocumentID] = len(this.items)
 		this.items = append(this.items, newDocument(message))
 	}
+}
+func (this *AllDocuments) documentRemoved(message events.DocumentRemoved) {
+	if _, contains := this.index[message.DocumentID]; !contains {
+		return
+	}
+
+	// shift each item in the items slice toward the front by one
+	for i := this.index[message.DocumentID]; i < len(this.items)-1; i++ {
+		item := this.items[i+1]
+		this.items[i] = item
+		this.index[item.DocumentID]--
+	}
+
+	delete(this.index, message.DocumentID)
+	this.items = this.items[:len(this.items)-1] // remove last element
 }
 
 func (this *AllDocuments) List() []Document { return this.items }
