@@ -48,7 +48,17 @@ func (this *AllDocuments) documentRemoved(message events.DocumentRemoved) {
 	this.items = this.items[:len(this.items)-1] // remove last element
 }
 func (this *AllDocuments) tagRemoved(message events.TagRemoved) {
-	// TODO
+	for _, document := range this.items {
+		removeTagFromDocument(&document, message.TagID)
+	}
+}
+func removeTagFromDocument(document *Document, tagID uint64) {
+	for i, tag := range document.Tags {
+		if tag == tagID {
+			document.Tags = append(document.Tags[:i], document.Tags[i+1:]...)
+			return
+		}
+	}
 }
 
 func (this *AllDocuments) List() []Document { return this.items }
