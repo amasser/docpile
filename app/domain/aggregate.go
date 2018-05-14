@@ -19,6 +19,7 @@ type Aggregate struct {
 	clock                *clock.Clock
 	identity             identity.Generator
 	tagsByID             map[uint64]string
+	tagSynonymsByID      map[uint64]map[string]struct{}
 	tagsByNormalizedName map[string]uint64
 	assetsByID           map[uint64]struct{}
 	managedAssets        map[events.SHA256Hash]uint64
@@ -30,6 +31,7 @@ func NewAggregate(identity identity.Generator) *Aggregate {
 	return &Aggregate{
 		identity:             identity,
 		tagsByID:             make(map[uint64]string),
+		tagSynonymsByID:      make(map[uint64]map[string]struct{}),
 		tagsByNormalizedName: make(map[string]uint64),
 		assetsByID:           make(map[uint64]struct{}),
 		managedAssets:        make(map[events.SHA256Hash]uint64),
@@ -265,10 +267,16 @@ func (this *Aggregate) applyTagAdded(message events.TagAdded) {
 	this.tagsByNormalizedName[normalizeTag(message.TagName)] = message.TagID
 }
 func (this *Aggregate) applyTagRemoved(message events.TagRemoved) {
-	tag := this.tagsByID[message.TagID]
+	tagName := this.tagsByID[message.TagID]
+	synonyms := this.tagSynonymsByID[message.TagID]
+
 	delete(this.tagsByID, message.TagID)
-	delete(this.tagsByNormalizedName, tag)
-	// TODO: remove all synonyms for that tag
+	delete(this.tagsByNormalizedName, tagName)
+	delete(this.tagSynonymsByID, message.TagID)
+
+	for synonym := range synonyms {
+		delete(this.tagsByNormalizedName, synonym)
+	}
 }
 func (this *Aggregate) applyTagRenamed(message events.TagRenamed) {
 	this.tagsByID[message.TagID] = message.NewName // full, not-normalized value
@@ -277,9 +285,16 @@ func (this *Aggregate) applyTagRenamed(message events.TagRenamed) {
 }
 func (this *Aggregate) applyTagSynonymDefined(message events.TagSynonymDefined) {
 	this.tagsByNormalizedName[normalizeTag(message.Synonym)] = message.TagID
+	synonyms := this.tagSynonymsByID[message.TagID]
+	if synonyms == nil {
+		synonyms = make(map[string]struct{})
+		this.tagSynonymsByID[message.TagID] = synonyms
+	}
+	synonyms[message.Synonym] = struct{}{}
 }
 func (this *Aggregate) applyTagSynonymRemoved(message events.TagSynonymRemoved) {
 	delete(this.tagsByNormalizedName, normalizeTag(message.Synonym))
+	delete(this.tagSynonymsByID[message.TagID], message.Synonym)
 }
 
 func (this *Aggregate) applyManagedAssetImported(message events.ManagedAssetImported) {
