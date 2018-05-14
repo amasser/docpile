@@ -38,7 +38,19 @@ func (this *AllTags) tagAdded(message events.TagAdded) {
 	}
 }
 func (this *AllTags) tagRemoved(message events.TagRemoved) {
-	// TODO
+	if _, contains := this.index[message.TagID]; !contains {
+		return
+	}
+
+	// shift each item in the items slice toward the front by one
+	for i := this.index[message.TagID]; i < len(this.items)-1; i++ {
+		item := this.items[i+1]
+		this.items[i] = item
+		this.index[item.TagID]--
+	}
+
+	delete(this.index, message.TagID)
+	this.items = this.items[:len(this.items)-1] // remove last element
 }
 func (this *AllTags) tagRenamed(message events.TagRenamed) {
 	this.load(message.TagID).TagName = message.NewName
