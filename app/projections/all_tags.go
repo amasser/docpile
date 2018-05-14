@@ -20,6 +20,8 @@ func (this *AllTags) Transform(message interface{}) {
 	switch message := message.(type) {
 	case events.TagAdded:
 		this.tagAdded(message)
+	case events.TagRemoved:
+		this.tagRemoved(message)
 	case events.TagRenamed:
 		this.tagRenamed(message)
 	case events.TagSynonymDefined:
@@ -34,6 +36,9 @@ func (this *AllTags) tagAdded(message events.TagAdded) {
 		this.index[message.TagID] = len(this.items)
 		this.items = append(this.items, newTag(message))
 	}
+}
+func (this *AllTags) tagRemoved(message events.TagRemoved) {
+	// TODO
 }
 func (this *AllTags) tagRenamed(message events.TagRenamed) {
 	this.load(message.TagID).TagName = message.NewName

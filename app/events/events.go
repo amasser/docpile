@@ -7,6 +7,10 @@ type TagAdded struct {
 	Timestamp time.Time `json:"timestamp"`
 	TagName   string    `json:"tag_name"`
 }
+type TagRemoved struct {
+	TagID     uint64    `json:"tag_id"`
+	Timestamp time.Time `json:"timestamp"`
+}
 type TagRenamed struct {
 	TagID     uint64    `json:"tag_id"`
 	Timestamp time.Time `json:"timestamp"`

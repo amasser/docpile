@@ -43,6 +43,8 @@ func (this *Aggregate) Handle(message interface{}) handlers.Result {
 
 	case AddTag:
 		return this.AddTag(message.Name)
+	case RemoveTag:
+		return this.RemoveTag(message.ID)
 	case RenameTag:
 		return this.RenameTag(message.ID, message.Name)
 	case DefineTagSynonym:
@@ -76,6 +78,16 @@ func (this *Aggregate) AddTag(name string) handlers.Result {
 		TagID:     id,
 		Timestamp: this.clock.UTCNow(),
 		TagName:   name,
+	})
+}
+func (this *Aggregate) RemoveTag(id uint64) handlers.Result {
+	if _, contains := this.tagsByID[id]; !contains {
+		return newResult(0, TagNotFoundError)
+	}
+
+	return this.raise(id, events.TagRemoved{
+		TagID:     id,
+		Timestamp: this.clock.UTCNow(),
 	})
 }
 func (this *Aggregate) RenameTag(id uint64, name string) handlers.Result {
@@ -225,6 +237,8 @@ func (this *Aggregate) apply(message interface{}) {
 
 	case events.TagAdded:
 		this.applyTagAdded(message)
+	case events.TagRemoved:
+		this.applyTagRemoved(message)
 	case events.TagRenamed:
 		this.applyTagRenamed(message)
 	case events.TagSynonymDefined:
@@ -249,6 +263,12 @@ func (this *Aggregate) apply(message interface{}) {
 func (this *Aggregate) applyTagAdded(message events.TagAdded) {
 	this.tagsByID[message.TagID] = message.TagName // full, not-normalized value
 	this.tagsByNormalizedName[normalizeTag(message.TagName)] = message.TagID
+}
+func (this *Aggregate) applyTagRemoved(message events.TagRemoved) {
+	tag := this.tagsByID[message.TagID]
+	delete(this.tagsByID, message.TagID)
+	delete(this.tagsByNormalizedName, tag)
+	// TODO: remove all synonyms for that tag
 }
 func (this *Aggregate) applyTagRenamed(message events.TagRenamed) {
 	this.tagsByID[message.TagID] = message.NewName // full, not-normalized value

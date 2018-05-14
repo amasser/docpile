@@ -10,6 +10,9 @@ import (
 type AddTag struct {
 	Name string
 }
+type RemoveTag struct {
+	ID uint64
+}
 type RenameTag struct {
 	ID   uint64
 	Name string

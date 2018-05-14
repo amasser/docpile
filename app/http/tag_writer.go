@@ -18,6 +18,16 @@ func NewTagWriter(handler handlers.Handler) *TagWriter {
 func (this *TagWriter) Add(input *inputs.AddTag) detour.Renderer {
 	return this.renderTagResult(domain.AddTag{Name: input.Name})
 }
+func (this *TagWriter) Remove(input *inputs.IDInput) detour.Renderer {
+	result := this.handler.Handle(domain.RemoveTag{ID: input.ID})
+	if result.Error == domain.TagNotFoundError {
+		return inputs.IDNotFoundResult
+	} else if result.Error != nil {
+		return UnknownErrorResult
+	} else {
+		return nil
+	}
+}
 func (this *TagWriter) Rename(input *inputs.RenameTag) detour.Renderer {
 	return this.renderTagResult(domain.RenameTag{ID: input.ID, Name: input.Name})
 }

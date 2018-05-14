@@ -22,6 +22,8 @@ func (this *AllDocuments) Transform(message interface{}) {
 		this.documentDefined(message)
 	case events.DocumentRemoved:
 		this.documentRemoved(message)
+	case events.TagRemoved:
+		this.tagRemoved(message)
 	}
 }
 func (this *AllDocuments) documentDefined(message events.DocumentDefined) {
@@ -44,6 +46,9 @@ func (this *AllDocuments) documentRemoved(message events.DocumentRemoved) {
 
 	delete(this.index, message.DocumentID)
 	this.items = this.items[:len(this.items)-1] // remove last element
+}
+func (this *AllDocuments) tagRemoved(message events.TagRemoved) {
+	// TODO
 }
 
 func (this *AllDocuments) List() []Document { return this.items }

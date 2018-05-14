@@ -1,9 +1,6 @@
 TODOs
 - EventStore: event-per file || remove line breaks from user text input || base64 encode JSON
 
-- Removing a tag (and all synonyms)
-    DELETE /tags/:id
-
 - apply/remove tags from documents
     PUT /documents/:id/tags
     DELETE /documents/:id/tags
