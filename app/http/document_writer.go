@@ -29,10 +29,6 @@ func (this *DocumentWriter) Define(input *inputs.DefineDocument) detour.Renderer
 		},
 	})
 }
-func (this *DocumentWriter) Remove(input *inputs.IDInput) detour.Renderer {
-	return this.renderResult(domain.RemoveDocument{ID: input.ID})
-}
-
 func (this *DocumentWriter) renderResult(message interface{}) detour.Renderer {
 	if result := this.handler.Handle(message); result.Error == nil {
 		return newEntityResult(result.ID)
@@ -45,5 +41,16 @@ func (this *DocumentWriter) renderResult(message interface{}) detour.Renderer {
 	} else {
 		return UnknownErrorResult
 	}
+}
 
+func (this *DocumentWriter) Remove(input *inputs.IDInput) detour.Renderer {
+	message := domain.RemoveDocument{ID: input.ID}
+	result := this.handler.Handle(message)
+	if result.Error == domain.DocumentNotFoundError {
+		return inputs.IDNotFoundResult
+	} else if result.Error != nil {
+		return UnknownErrorResult
+	} else {
+		return nil // OK
+	}
 }
