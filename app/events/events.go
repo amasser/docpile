@@ -55,6 +55,10 @@ type DocumentDefined struct {
 	Documents   []uint64   `json:"documents,omitempty"`
 	Description string     `json:"description,omitempty"`
 }
+type DocumentRemoved struct {
+	DocumentID uint64    `json:"document_id"`
+	Timestamp  time.Time `json:"timestamp"`
+}
 
 var Types = map[string]interface{}{
 	"tag-added":              TagAdded{},
@@ -64,4 +68,5 @@ var Types = map[string]interface{}{
 	"managed-asset-imported": ManagedAssetImported{},
 	"cloud-asset-imported":   CloudAssetImported{},
 	"document-defined":       DocumentDefined{},
+	"document-removed":       DocumentRemoved{},
 }

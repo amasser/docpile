@@ -196,6 +196,17 @@ func (this *Aggregate) validDefinition(doc DocumentDefinition) error {
 	return nil
 }
 
+func (this *Aggregate) RemoveDocument(id uint64) handlers.Result {
+	if _, contains := this.documentsByID[id]; !contains {
+		return newResult(0, DocumentNotFoundError)
+	}
+
+	return this.raise(id, events.DocumentRemoved{
+		DocumentID: id,
+		Timestamp:  this.clock.UTCNow(),
+	})
+}
+
 func (this *Aggregate) raise(id uint64, event interface{}) handlers.Result {
 	this.apply(event)
 	this.events = append(this.events, event)
@@ -226,6 +237,8 @@ func (this *Aggregate) apply(message interface{}) {
 
 	case events.DocumentDefined:
 		this.applyDocumentDefined(message)
+	case events.DocumentRemoved:
+		this.applyDocumentRemoved(message)
 	default:
 		log.Panicf(fmt.Sprintf("Aggregate cannot apply '%s'", reflect.TypeOf(message)))
 	}
@@ -258,6 +271,9 @@ func (this *Aggregate) applyCloudAssetImported(message events.CloudAssetImported
 
 func (this *Aggregate) applyDocumentDefined(message events.DocumentDefined) {
 	this.documentsByID[message.DocumentID] = struct{}{}
+}
+func (this *Aggregate) applyDocumentRemoved(message events.DocumentRemoved) {
+	delete(this.documentsByID, message.DocumentID)
 }
 
 func (this *Aggregate) Consume() []interface{} {
