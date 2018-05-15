@@ -57,9 +57,7 @@ func (this *Wireup) BuildMessageHandler(aggregate handlers.Aggregate, store even
 	application = domain.NewWriteAssetHandler(application, storage.NewFileStorage(this.dataPath))
 	return application
 }
-func (this *Wireup) buildApplicator(store eventstore.EventStore, projector *projections.Projector) applicators.Applicator {
-	applicator := SampleApplicator()
-	applicator = applicators.NewFanout(applicator, projector)
+func (this *Wireup) buildApplicator(store eventstore.EventStore, applicator applicators.Applicator) applicators.Applicator {
 	applicator = applicators.NewMutex(applicator, this.mutex)
 	applicator = applicators.NewChannel(applicator, applicators.StartChannel())
 	applicator = eventstore.NewApplicator(applicator, store)
