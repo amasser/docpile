@@ -8,10 +8,10 @@ import (
 
 type Search struct {
 	documents *projections.AllDocuments
-	tags      *projections.TagSearch
+	tags      *projections.MatchingTags
 }
 
-func NewSearch(documents *projections.AllDocuments, tags *projections.TagSearch) *Search {
+func NewSearch(documents *projections.AllDocuments, tags *projections.MatchingTags) *Search {
 	return &Search{documents: documents, tags: tags}
 }
 
@@ -24,7 +24,6 @@ func (this *Search) Documents(input *inputs.SearchDocument) detour.Renderer {
 	return jsonResult(results)
 }
 func (this *Search) Tags(input *inputs.SearchTag) detour.Renderer {
-	criteria := projections.NewTagCriteria(input.Text, input.Tags)
-	results := this.tags.Search(criteria)
+	results := this.tags.Search(input.Text, input.Tags)
 	return jsonResult(results)
 }

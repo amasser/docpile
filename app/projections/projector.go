@@ -3,14 +3,14 @@ package projections
 type Projector struct {
 	AllTags      *AllTags
 	AllDocuments *AllDocuments
-	TagSearch    *TagSearch
+	MatchingTags *MatchingTags
 }
 
 func NewProjector() *Projector {
 	return &Projector{
 		AllTags:      NewAllTags(),
 		AllDocuments: NewAllDocuments(),
-		TagSearch:    NewTagSearch(),
+		MatchingTags: NewMatchingTags(),
 	}
 }
 
@@ -24,5 +24,5 @@ func (this *Projector) Apply(messages []interface{}) {
 func (this *Projector) apply(message interface{}) {
 	this.AllTags.Transform(message)
 	this.AllDocuments.Transform(message)
-	this.TagSearch.Transform(message)
+	this.MatchingTags.Transform(message)
 }
