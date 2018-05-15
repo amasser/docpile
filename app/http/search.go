@@ -7,24 +7,19 @@ import (
 )
 
 type Search struct {
-	search searcher
+	projector *projections.Projector
 }
 
-func NewSearch(search searcher) *Search {
-	return &Search{search: search}
+func NewSearch(projector *projections.Projector) *Search {
+	return &Search{projector: projector}
 }
 
 func (this *Search) Documents(input *inputs.SearchDocument) detour.Renderer {
-	spec := projections.NewDocumentSearch(
+	return jsonResult(this.projector.SearchDocuments(projections.NewDocumentSearch(
 		input.PublishedMin, input.PublishedMax,
 		input.PeriodMin, input.PeriodMax,
-		input.Tags)
-	return jsonResult(this.search.SearchDocuments(spec))
+		input.Tags)))
 }
 func (this *Search) Tags(input *inputs.SearchTag) detour.Renderer {
 	return nil
-}
-
-type searcher interface {
-	SearchDocuments(projections.DocumentSpecification) interface{}
 }

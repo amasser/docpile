@@ -16,8 +16,8 @@ func NewDocumentSearch(
 	periodMin *time.Time,
 	periodMax *time.Time,
 	tags []uint64,
-) *DocumentSearch {
-	return &DocumentSearch{
+) DocumentSearch {
+	return DocumentSearch{
 		publishedMin: publishedMin,
 		publishedMax: publishedMax,
 		periodMin:    periodMin,

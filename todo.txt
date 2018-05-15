@@ -27,3 +27,5 @@ GET /search/tags?text=search+query&tag=previouslySelectedTagID1&tag=previouslySe
 In this search above, "search query" would not return any tag names/synonyms for
 previouslySelectedTagID1 and previouslySelectedTagID2. Further, "search query" would only match
 names and synonyms for tags for documents that contain by previouslySelectedTagID1 and 2.
+
+https://github.com/sahilm/fuzzy
