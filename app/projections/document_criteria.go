@@ -1,12 +1,8 @@
-package search
+package projections
 
-import (
-	"time"
+import "time"
 
-	"bitbucket.org/jonathanoliver/docpile/app/projections"
-)
-
-type DocumentSpecification struct {
+type DocumentCriteria struct {
 	publishedMin *time.Time
 	publishedMax *time.Time
 	periodMin    *time.Time
@@ -14,14 +10,14 @@ type DocumentSpecification struct {
 	tags         []uint64
 }
 
-func NewDocumentSpecification(
+func NewDocumentCriteria(
 	publishedMin *time.Time,
 	publishedMax *time.Time,
 	periodMin *time.Time,
 	periodMax *time.Time,
 	tags []uint64,
-) DocumentSpecification {
-	return DocumentSpecification{
+) DocumentCriteria {
+	return DocumentCriteria{
 		publishedMin: publishedMin,
 		publishedMax: publishedMax,
 		periodMin:    periodMin,
@@ -30,13 +26,13 @@ func NewDocumentSpecification(
 	}
 }
 
-func (this *DocumentSpecification) IsSatisfiedBy(document projections.Document) bool {
+func (this *DocumentCriteria) Match(document Document) bool {
 	return this.withinPublishedLimits(document.Published) &&
 		this.withinPeriodLimits(document.PeriodMin, document.PeriodMax) &&
 		this.containsAllSearchTags(document.Tags)
 }
 
-func (this *DocumentSpecification) withinPublishedLimits(published *time.Time) bool {
+func (this *DocumentCriteria) withinPublishedLimits(published *time.Time) bool {
 	if published == nil {
 		return true
 	}
@@ -52,7 +48,7 @@ func (this *DocumentSpecification) withinPublishedLimits(published *time.Time) b
 	return true
 }
 
-func (this *DocumentSpecification) withinPeriodLimits(min, max *time.Time) bool {
+func (this *DocumentCriteria) withinPeriodLimits(min, max *time.Time) bool {
 	if min == nil && max == nil {
 		return true
 	}
@@ -68,7 +64,7 @@ func (this *DocumentSpecification) withinPeriodLimits(min, max *time.Time) bool 
 	return true
 }
 
-func (this *DocumentSpecification) containsAllSearchTags(documentTags []uint64) bool {
+func (this *DocumentCriteria) containsAllSearchTags(documentTags []uint64) bool {
 	for _, searchTag := range this.tags {
 		if !documentTagsContainSearchTag(searchTag, documentTags) {
 			return false

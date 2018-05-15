@@ -69,6 +69,18 @@ var (
 
 //////////////////////////////////////////////////////////////
 
+func (this *AllDocuments) Search(search DocumentCriteria) (matching []Document) {
+	for _, document := range this.items {
+		if search.Match(document) {
+			matching = append(matching, document)
+		}
+	}
+
+	return matching
+}
+
+//////////////////////////////////////////////////////////////
+
 type Document struct {
 	DocumentID  uint64     `json:"document_id"`
 	Timestamp   time.Time  `json:"timestamp"`

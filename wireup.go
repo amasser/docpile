@@ -8,7 +8,6 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/app/events"
 	"bitbucket.org/jonathanoliver/docpile/app/http"
 	"bitbucket.org/jonathanoliver/docpile/app/projections"
-	"bitbucket.org/jonathanoliver/docpile/app/search"
 	"bitbucket.org/jonathanoliver/docpile/generic/applicators"
 	"bitbucket.org/jonathanoliver/docpile/generic/eventstore"
 	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
@@ -72,9 +71,7 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	assetWriter := http.NewAssetWriter(application)
 	documentWriter := http.NewDocumentWriter(application)
 	reader := http.NewReader(projector)
-
-	documentSearcher := search.NewDocumentSearcher(projector.AllDocuments())
-	searcher := http.NewSearch(documentSearcher)
+	search := http.NewSearch(projector.AllDocuments())
 
 	router := buildRouter()
 	router.Handler("PUT", "/tags", this.writerAction(tagWriter.Add))
@@ -93,8 +90,8 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	router.Handler("GET", "/documents/:id", this.readerAction(reader.LoadDocument))
 
 	// these methods don't mutate, but binding is easier when JSON decoding the request body.
-	router.Handler("POST", "/search/documents", this.readerAction(searcher.Documents))
-	router.Handler("POST", "/search/tags", this.readerAction(searcher.Tags))
+	router.Handler("POST", "/search/documents", this.readerAction(search.Documents))
+	router.Handler("POST", "/search/tags", this.readerAction(search.Tags))
 
 	return router
 }

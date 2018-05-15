@@ -2,20 +2,20 @@ package http
 
 import (
 	"bitbucket.org/jonathanoliver/docpile/app/http/inputs"
-	"bitbucket.org/jonathanoliver/docpile/app/search"
+	"bitbucket.org/jonathanoliver/docpile/app/projections"
 	"github.com/smartystreets/detour"
 )
 
 type Search struct {
-	documents *search.DocumentSearcher
+	projection *projections.AllDocuments
 }
 
-func NewSearch(documents *search.DocumentSearcher) *Search {
-	return &Search{documents: documents}
+func NewSearch(projection *projections.AllDocuments) *Search {
+	return &Search{projection: projection}
 }
 
 func (this *Search) Documents(input *inputs.SearchDocument) detour.Renderer {
-	return jsonResult(this.documents.Search(search.NewDocumentSpecification(
+	return jsonResult(this.projection.Search(projections.NewDocumentCriteria(
 		input.PublishedMin, input.PublishedMax,
 		input.PeriodMin, input.PeriodMax,
 		input.Tags)))
