@@ -14,10 +14,10 @@ func NewReader(reader projectionReader) *Reader {
 }
 
 func (this *Reader) ListTags() detour.Renderer {
-	return detour.JSONResult{Content: this.reader.ListTags()}
+	return jsonResult(this.reader.ListTags())
 }
 func (this *Reader) ListDocuments() detour.Renderer {
-	return detour.JSONResult{Content: this.reader.ListDocuments()}
+	return jsonResult(this.reader.ListDocuments())
 }
 
 func (this *Reader) LoadTag(input *inputs.IDInput) detour.Renderer {
@@ -30,7 +30,7 @@ func (this *Reader) render(value interface{}, err error) detour.Renderer {
 	if err != nil {
 		return inputs.IDNotFoundResult
 	} else {
-		return detour.JSONResult{Content: value}
+		return jsonResult(value)
 	}
 }
 
