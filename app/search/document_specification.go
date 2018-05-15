@@ -1,8 +1,12 @@
-package projections
+package search
 
-import "time"
+import (
+	"time"
 
-type DocumentSearch struct {
+	"bitbucket.org/jonathanoliver/docpile/app/projections"
+)
+
+type DocumentSpecification struct {
 	publishedMin *time.Time
 	publishedMax *time.Time
 	periodMin    *time.Time
@@ -10,14 +14,14 @@ type DocumentSearch struct {
 	tags         []uint64
 }
 
-func NewDocumentSearch(
+func NewDocumentSpecification(
 	publishedMin *time.Time,
 	publishedMax *time.Time,
 	periodMin *time.Time,
 	periodMax *time.Time,
 	tags []uint64,
-) DocumentSearch {
-	return DocumentSearch{
+) DocumentSpecification {
+	return DocumentSpecification{
 		publishedMin: publishedMin,
 		publishedMax: publishedMax,
 		periodMin:    periodMin,
@@ -26,13 +30,13 @@ func NewDocumentSearch(
 	}
 }
 
-func (this *DocumentSearch) IsSatisfiedBy(document Document) bool {
+func (this *DocumentSpecification) IsSatisfiedBy(document projections.Document) bool {
 	return this.withinPublishedLimits(document.Published) &&
 		this.withinPeriodLimits(document.PeriodMin, document.PeriodMax) &&
 		this.containsAllSearchTags(document.Tags)
 }
 
-func (this *DocumentSearch) withinPublishedLimits(published *time.Time) bool {
+func (this *DocumentSpecification) withinPublishedLimits(published *time.Time) bool {
 	if published == nil {
 		return true
 	}
@@ -48,7 +52,7 @@ func (this *DocumentSearch) withinPublishedLimits(published *time.Time) bool {
 	return true
 }
 
-func (this *DocumentSearch) withinPeriodLimits(min, max *time.Time) bool {
+func (this *DocumentSpecification) withinPeriodLimits(min, max *time.Time) bool {
 	if min == nil && max == nil {
 		return true
 	}
@@ -64,7 +68,7 @@ func (this *DocumentSearch) withinPeriodLimits(min, max *time.Time) bool {
 	return true
 }
 
-func (this *DocumentSearch) containsAllSearchTags(documentTags []uint64) bool {
+func (this *DocumentSpecification) containsAllSearchTags(documentTags []uint64) bool {
 	for _, searchTag := range this.tags {
 		if !documentTagsContainSearchTag(searchTag, documentTags) {
 			return false
