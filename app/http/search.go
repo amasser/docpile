@@ -7,19 +7,24 @@ import (
 )
 
 type Search struct {
-	projection *projections.AllDocuments
+	allDocuments  *projections.AllDocuments
+	tagProjection *projections.TagProjection
 }
 
-func NewSearch(projection *projections.AllDocuments) *Search {
-	return &Search{projection: projection}
+func NewSearch(allDocuments *projections.AllDocuments, tagProjection *projections.TagProjection) *Search {
+	return &Search{allDocuments: allDocuments, tagProjection: tagProjection}
 }
 
 func (this *Search) Documents(input *inputs.SearchDocument) detour.Renderer {
-	return jsonResult(this.projection.Search(projections.NewDocumentCriteria(
+	criteria := projections.NewDocumentCriteria(
 		input.PublishedMin, input.PublishedMax,
 		input.PeriodMin, input.PeriodMax,
-		input.Tags)))
+		input.Tags)
+	results := this.allDocuments.Search(criteria)
+	return jsonResult(results)
 }
 func (this *Search) Tags(input *inputs.SearchTag) detour.Renderer {
-	return nil
+	criteria := projections.NewTagCriteria(input.Text, input.Tags)
+	results := this.tagProjection.Search(criteria)
+	return jsonResult(results)
 }
