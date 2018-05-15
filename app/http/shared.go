@@ -14,3 +14,7 @@ var UnknownErrorResult = detour.StatusCodeResult{
 func newEntityResult(id uint64) detour.Renderer {
 	return detour.JSONResult{Content: id, StatusCode: http.StatusCreated}
 }
+
+func jsonResult(value interface{}) detour.Renderer{
+	return detour.JSONResult{Content: value}
+}

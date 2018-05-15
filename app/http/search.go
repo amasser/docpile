@@ -19,13 +19,10 @@ func (this *Search) Documents(input *inputs.SearchDocument) detour.Renderer {
 		input.PublishedMin, input.PublishedMax,
 		input.PeriodMin, input.PeriodMax,
 		input.Tags)
-	return this.json(this.search.SearchDocuments(spec))
+	return jsonResult(this.search.SearchDocuments(spec))
 }
 func (this *Search) Tags(input *inputs.SearchTag) detour.Renderer {
 	return nil
-}
-func (this *Search) json(value interface{}) detour.Renderer {
-	return detour.JSONResult{Content: value}
 }
 
 type searcher interface {
