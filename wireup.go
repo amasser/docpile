@@ -68,8 +68,8 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	tagWriter := http.NewTagWriter(application)
 	assetWriter := http.NewAssetWriter(application)
 	documentWriter := http.NewDocumentWriter(application)
-	reader := http.NewReader(projector)
-	search := http.NewSearch(projector.AllDocuments(), projector.TagSearch())
+	reader := http.NewReader(projector.AllTags, projector.AllDocuments)
+	search := http.NewSearch(projector.AllDocuments, projector.TagSearch)
 
 	router := buildRouter()
 	router.Handler("PUT", "/tags", this.writerAction(tagWriter.Add))

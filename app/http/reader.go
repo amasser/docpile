@@ -2,29 +2,31 @@ package http
 
 import (
 	"bitbucket.org/jonathanoliver/docpile/app/http/inputs"
+	"bitbucket.org/jonathanoliver/docpile/app/projections"
 	"github.com/smartystreets/detour"
 )
 
 type Reader struct {
-	reader projectionReader
+	tags      *projections.AllTags
+	documents *projections.AllDocuments
 }
 
-func NewReader(reader projectionReader) *Reader {
-	return &Reader{reader: reader}
+func NewReader(tags *projections.AllTags, documents *projections.AllDocuments) *Reader {
+	return &Reader{tags: tags, documents: documents}
 }
 
 func (this *Reader) ListTags() detour.Renderer {
-	return jsonResult(this.reader.ListTags())
+	return jsonResult(this.tags.List())
 }
 func (this *Reader) ListDocuments() detour.Renderer {
-	return jsonResult(this.reader.ListDocuments())
+	return jsonResult(this.documents.List())
 }
 
 func (this *Reader) LoadTag(input *inputs.IDInput) detour.Renderer {
-	return this.render(this.reader.LoadTag(input.ID))
+	return this.render(this.tags.Load(input.ID))
 }
 func (this *Reader) LoadDocument(input *inputs.IDInput) detour.Renderer {
-	return this.render(this.reader.LoadDocument(input.ID))
+	return this.render(this.documents.Load(input.ID))
 }
 func (this *Reader) render(value interface{}, err error) detour.Renderer {
 	if err != nil {
@@ -32,11 +34,4 @@ func (this *Reader) render(value interface{}, err error) detour.Renderer {
 	} else {
 		return jsonResult(value)
 	}
-}
-
-type projectionReader interface {
-	ListTags() interface{}
-	LoadTag(uint64) (interface{}, error)
-	ListDocuments() interface{}
-	LoadDocument(uint64) (interface{}, error)
 }
