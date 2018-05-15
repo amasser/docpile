@@ -7,12 +7,12 @@ import (
 )
 
 type Search struct {
-	allDocuments  *projections.AllDocuments
-	tagProjection *projections.TagProjection
+	documents *projections.AllDocuments
+	tags      *projections.TagSearch
 }
 
-func NewSearch(allDocuments *projections.AllDocuments, tagProjection *projections.TagProjection) *Search {
-	return &Search{allDocuments: allDocuments, tagProjection: tagProjection}
+func NewSearch(documents *projections.AllDocuments, tags *projections.TagSearch) *Search {
+	return &Search{documents: documents, tags: tags}
 }
 
 func (this *Search) Documents(input *inputs.SearchDocument) detour.Renderer {
@@ -20,11 +20,11 @@ func (this *Search) Documents(input *inputs.SearchDocument) detour.Renderer {
 		input.PublishedMin, input.PublishedMax,
 		input.PeriodMin, input.PeriodMax,
 		input.Tags)
-	results := this.allDocuments.Search(criteria)
+	results := this.documents.Search(criteria)
 	return jsonResult(results)
 }
 func (this *Search) Tags(input *inputs.SearchTag) detour.Renderer {
 	criteria := projections.NewTagCriteria(input.Text, input.Tags)
-	results := this.tagProjection.Search(criteria)
+	results := this.tags.Search(criteria)
 	return jsonResult(results)
 }

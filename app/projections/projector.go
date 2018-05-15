@@ -1,16 +1,16 @@
 package projections
 
 type Projector struct {
-	allTags       *AllTags
-	allDocuments  *AllDocuments
-	tagProjection *TagProjection
+	allTags      *AllTags
+	allDocuments *AllDocuments
+	tagSearch    *TagSearch
 }
 
 func NewProjector() *Projector {
 	return &Projector{
-		allTags:       NewAllTags(),
-		allDocuments:  NewAllDocuments(),
-		tagProjection: NewTagProjection(),
+		allTags:      NewAllTags(),
+		allDocuments: NewAllDocuments(),
+		tagSearch:    NewTagSearch(),
 	}
 }
 
@@ -24,7 +24,7 @@ func (this *Projector) Apply(messages []interface{}) {
 func (this *Projector) apply(message interface{}) {
 	this.allTags.Transform(message)
 	this.allDocuments.Transform(message)
-	this.tagProjection.Transform(message)
+	this.tagSearch.Transform(message)
 }
 
 ///////////////////////////////////////////
@@ -36,5 +36,5 @@ func (this *Projector) LoadDocument(id uint64) (interface{}, error) { return thi
 
 ///////////////////////////////////////////
 
-func (this *Projector) AllDocuments() *AllDocuments   { return this.allDocuments }
-func (this *Projector) TagProjection() *TagProjection { return this.tagProjection }
+func (this *Projector) AllDocuments() *AllDocuments { return this.allDocuments }
+func (this *Projector) TagSearch() *TagSearch       { return this.tagSearch }
