@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"github.com/smartystreets/httpx"
+	"github.com/smartystreets/listeners"
 )
+
+const listenAddress = "127.0.0.1:8080"
 
 func main() {
 	const workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
@@ -20,7 +22,7 @@ func main() {
 
 	application := wireup.BuildMessageHandler(aggregate, store, projector)
 	httpHandler := wireup.BuildHTTPHandler(application, projector)
-
-	fmt.Println("Listening...")
-	http.ListenAndServe("127.0.0.1:8080", httpHandler)
+	httpServer := httpx.NewHTTPServer(listenAddress, httpHandler)
+	listener := listeners.NewCompositeWaitShutdownListener(httpServer)
+	listener.Listen()
 }
