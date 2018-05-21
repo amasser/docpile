@@ -29,6 +29,10 @@ func (this *Channel) Listen() {
 	}
 }
 
+func (this *Channel) Close() {
+	close(this.channel)
+}
+
 ////////////////////////////////////////////////////////
 
 type ChannelOption func(*Channel)

@@ -25,6 +25,10 @@ func (this *Channel) Apply(messages []interface{}) {
 	this.channel <- messages
 }
 
+func (this *Channel) Close() {
+	close(this.channel)
+}
+
 ////////////////////////////////////////////////////////
 
 type ChannelOption func(*Channel)
