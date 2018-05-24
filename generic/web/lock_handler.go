@@ -1,13 +1,16 @@
 package web
 
-import "net/http"
+import (
+	"net/http"
+	"sync"
+)
 
 type LockHandler struct {
-	mutex locker
+	mutex sync.Locker
 	inner http.Handler
 }
 
-func NewLockHandler(mutex locker, inner http.Handler) *LockHandler {
+func NewLockHandler(mutex sync.Locker, inner http.Handler) *LockHandler {
 	return &LockHandler{mutex: mutex, inner: inner}
 }
 

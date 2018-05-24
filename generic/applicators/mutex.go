@@ -1,11 +1,13 @@
 package applicators
 
+import "sync"
+
 type Mutex struct {
 	inner Applicator
-	mutex locker
+	mutex sync.Locker
 }
 
-func NewMutex(inner Applicator, mutex locker) *Mutex {
+func NewMutex(inner Applicator, mutex sync.Locker) *Mutex {
 	return &Mutex{inner: inner, mutex: mutex}
 }
 
