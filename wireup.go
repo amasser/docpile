@@ -50,18 +50,13 @@ func (this *Wireup) BuildProjector() *projections.Projector {
 }
 
 func (this *Wireup) BuildMessageHandler(aggregate handlers.Aggregate, store eventstore.EventStore, projector *projections.Projector) handlers.Handler {
-	var applicator = this.buildApplicator(store, projector)
+	mutexApplicator := applicators.NewMutex(projector, this.mutex)
+	channelApplicator := applicators.NewChannel(mutexApplicator, applicators.StartChannel())
+	eventstoreApplicator := eventstore.NewApplicator(channelApplicator, store)
 
-	var application handlers.Handler = handlers.NewDomain(aggregate, applicator)
-	application = handlers.NewChannel(application, handlers.StartChannel())
-	application = domain.NewWriteAssetHandler(application, storage.NewFileStorage(this.dataPath))
-	return application
-}
-func (this *Wireup) buildApplicator(store eventstore.EventStore, applicator applicators.Applicator) applicators.Applicator {
-	applicator = applicators.NewMutex(applicator, this.mutex)
-	applicator = applicators.NewChannel(applicator, applicators.StartChannel())
-	applicator = eventstore.NewApplicator(applicator, store)
-	return applicator
+	domainHandler := handlers.NewDomain(aggregate, eventstoreApplicator)
+	channelHandler := handlers.NewChannel(domainHandler, handlers.StartChannel())
+	return domain.NewWriteAssetHandler(channelHandler, storage.NewFileStorage(this.dataPath))
 }
 
 func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *projections.Projector) stdhttp.Handler {
