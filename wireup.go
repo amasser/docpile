@@ -14,7 +14,6 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/generic/identity"
 	"bitbucket.org/jonathanoliver/docpile/generic/serialization"
 	"bitbucket.org/jonathanoliver/docpile/generic/storage"
-	"bitbucket.org/jonathanoliver/docpile/generic/web"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
 	"github.com/smartystreets/httpx/middleware"
