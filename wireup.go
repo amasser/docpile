@@ -17,6 +17,7 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/generic/web"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
+	"github.com/smartystreets/httpx/middleware"
 )
 
 type Wireup struct {
@@ -97,7 +98,7 @@ func (this *Wireup) writerAction(action interface{}) stdhttp.Handler {
 	return detour.New(action)
 }
 func (this *Wireup) readerAction(action interface{}) stdhttp.Handler {
-	return web.NewLockHandler(this.mutex.RLocker(), detour.New(action))
+	return middleware.NewLockHandler(this.mutex.RLocker(), detour.New(action))
 }
 
 func buildRouter() *httprouter.Router {
