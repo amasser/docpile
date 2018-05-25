@@ -16,13 +16,16 @@ import (
 	"bitbucket.org/jonathanoliver/docpile/generic/storage"
 	"github.com/julienschmidt/httprouter"
 	"github.com/smartystreets/detour"
+	"github.com/smartystreets/httpx"
 	"github.com/smartystreets/httpx/middleware"
+	"github.com/smartystreets/listeners"
 )
 
 type Wireup struct {
 	indexPath string
 	dataPath  string
 	mutex     *sync.RWMutex
+	listeners []listeners.Listener
 }
 
 func NewWireup(indexPath string, dataPath string) *Wireup {
@@ -51,11 +54,14 @@ func (this *Wireup) BuildProjector() *projections.Projector {
 
 func (this *Wireup) BuildMessageHandler(aggregate handlers.Aggregate, store eventstore.EventStore, projector *projections.Projector) handlers.Handler {
 	mutexApplicator := applicators.NewMutex(projector, this.mutex)
-	channelApplicator := applicators.NewChannel(mutexApplicator, applicators.StartChannel())
+	channelApplicator := applicators.NewChannel(mutexApplicator)
 	eventstoreApplicator := eventstore.NewApplicator(channelApplicator, store)
 
 	domainHandler := handlers.NewDomain(aggregate, eventstoreApplicator)
-	channelHandler := handlers.NewChannel(domainHandler, handlers.StartChannel())
+	channelHandler := handlers.NewChannel(domainHandler)
+
+	this.listeners = append(this.listeners, channelHandler, channelApplicator)
+
 	return domain.NewWriteAssetHandler(channelHandler, storage.NewFileStorage(this.dataPath))
 }
 
@@ -102,4 +108,14 @@ func buildRouter() *httprouter.Router {
 	router.RedirectTrailingSlash = false
 	router.RedirectFixedPath = false
 	return router
+}
+
+func (this *Wireup) BuildHTTPServer(listenAddress string, handler stdhttp.Handler) {
+	server := httpx.NewHTTPServer(listenAddress, handler)
+	this.listeners = append([]listeners.Listener{server}, this.listeners...) // prepend HTTP server
+}
+
+func (this *Wireup) BuildListener() listeners.ListenCloser {
+	listener := listeners.NewCascadingWaitListener(this.listeners...)
+	return listeners.NewCompositeWaitShutdownListener(listener)
 }

@@ -7,14 +7,8 @@ type Channel struct {
 	channel chan *envelope
 }
 
-func NewChannel(inner Handler, options ...ChannelOption) *Channel {
-	this := &Channel{inner: inner, channel: make(chan *envelope, 1024)}
-
-	for _, option := range options {
-		option(this)
-	}
-
-	return this
+func NewChannel(inner Handler) *Channel {
+	return &Channel{inner: inner, channel: make(chan *envelope, 1024)}
 }
 
 func (this *Channel) Handle(message interface{}) Result {
@@ -32,12 +26,6 @@ func (this *Channel) Listen() {
 func (this *Channel) Close() {
 	close(this.channel)
 }
-
-////////////////////////////////////////////////////////
-
-type ChannelOption func(*Channel)
-
-func StartChannel() ChannelOption { return func(this *Channel) { go this.Listen() } }
 
 ////////////////////////////////////////////////////////
 
