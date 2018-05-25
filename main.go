@@ -25,4 +25,5 @@ func main() {
 
 	listener := wireup.BuildListener()
 	listener.Listen()
+	log.Println("[INFO] Application shutdown complete.")
 }
