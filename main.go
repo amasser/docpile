@@ -2,12 +2,16 @@ package main
 
 import "log"
 
-const listenAddress = "127.0.0.1:8080"
+const (
+	listenAddress = "127.0.0.1:8080"
+	workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
+)
+
+func init() {
+	log.SetFlags(log.Llongfile | log.Lmicroseconds)
+}
 
 func main() {
-	log.SetFlags(log.Llongfile | log.Lmicroseconds)
-
-	const workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
 	wireup := NewWireup(workspacePath, workspacePath)
 
 	aggregate := wireup.BuildDomain()
@@ -25,5 +29,4 @@ func main() {
 
 	listener := wireup.BuildListener()
 	listener.Listen()
-	log.Println("[INFO] Application shutdown complete.")
 }
