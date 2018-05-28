@@ -7,10 +7,13 @@ type Projector struct {
 }
 
 func NewProjector() *Projector {
+	tags := NewAllTags()
+	docs := NewAllDocuments()
+
 	return &Projector{
-		AllTags:      NewAllTags(),
-		AllDocuments: NewAllDocuments(),
-		MatchingTags: NewMatchingTags(),
+		AllTags:      tags,
+		AllDocuments: docs,
+		MatchingTags: NewMatchingTags(docs, tags),
 	}
 }
 
@@ -24,5 +27,4 @@ func (this *Projector) Apply(messages []interface{}) {
 func (this *Projector) apply(message interface{}) {
 	this.AllTags.Transform(message)
 	this.AllDocuments.Transform(message)
-	this.MatchingTags.Transform(message)
 }

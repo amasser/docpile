@@ -3,9 +3,9 @@ package projections
 import "github.com/sahilm/fuzzy"
 
 type TagSearch struct {
-	allDocs  []Document
-	allTags  map[uint64]Tag
-	synonyms map[string]bool
+	allDocs      []Document
+	tagIndexByID map[uint64]int
+	allTags      []Tag
 
 	searchText         string
 	selectedTagIDs     []uint64
@@ -15,16 +15,24 @@ type TagSearch struct {
 	results            []MatchingTag
 }
 
-func NewTagSearch(searchText string, selectedTagIDs []uint64) *TagSearch {
-	return &TagSearch{searchText: searchText, selectedTagIDs: selectedTagIDs}
+func NewTagSearch(documents []Document, tagIndexByID map[uint64]int, allTags []Tag) *TagSearch {
+	return &TagSearch{
+		allDocs:      documents,
+		tagIndexByID: tagIndexByID,
+		allTags:      allTags,
+	}
 }
 
-func (this *TagSearch) Search() []MatchingTag {
+func (this *TagSearch) Search(searchText string, selectedTagIDs []uint64) []MatchingTag {
+	this.searchText = searchText
+	this.selectedTagIDs = selectedTagIDs
+
 	this.gatherCandidates()
 	this.conductSearch()
 	this.renderResults()
 	return this.results
 }
+
 func (this *TagSearch) gatherCandidates() {
 	candidates := make(map[uint64]struct{})
 	criteria := NewDocumentCriteria(nil, nil, nil, nil, this.selectedTagIDs)
@@ -42,24 +50,44 @@ func (this *TagSearch) gatherCandidates() {
 		delete(candidates, selectedTagID)
 	}
 
+	this.addCandidates(candidates)
+}
+func (this *TagSearch) addCandidates(candidates map[uint64]struct{}) {
 	this.candidateTagIDs = make([]uint64, 0, len(candidates))
 	this.candidateTagValues = make([]string, 0, len(candidates))
-
 	for tagID := range candidates {
-		this.candidateTagIDs = append(this.candidateTagIDs, tagID)
-		this.candidateTagValues = append(this.candidateTagValues, this.allTags[tagID].TagName)
+		this.addCandidate(tagID)
 	}
 }
+func (this *TagSearch) addCandidate(tagID uint64) {
+	tag := this.getTag(tagID)
+	this.candidateTagIDs = append(this.candidateTagIDs, tag.TagID)
+	this.candidateTagValues = append(this.candidateTagValues, tag.TagName)
+	for synonym := range tag.Synonyms {
+		this.candidateTagValues = append(this.candidateTagValues, synonym)
+	}
+}
+
 func (this *TagSearch) conductSearch() {
 	this.fuzzyMatches = fuzzy.Find(this.searchText, this.candidateTagValues)
 }
+
 func (this *TagSearch) renderResults() {
 	for _, fuzzyMatch := range this.fuzzyMatches {
+		tagID := this.candidateTagIDs[fuzzyMatch.Index]
+		isSynonym := this.isSynonym(tagID, fuzzyMatch.Str)
 		this.results = append(this.results, MatchingTag{
-			TagID:   this.candidateTagIDs[fuzzyMatch.Index],
+			TagID:   tagID,
 			TagText: fuzzyMatch.Str,
-			Synonym: this.synonyms[fuzzyMatch.Str],
+			Synonym: isSynonym,
 			Indexes: fuzzyMatch.MatchedIndexes,
 		})
 	}
+}
+func (this *TagSearch) isSynonym(id uint64, value string) bool {
+	return this.getTag(id).TagName != value
+}
+
+func (this *TagSearch) getTag(id uint64) Tag {
+	return this.allTags[this.tagIndexByID[id]]
 }
