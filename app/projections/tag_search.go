@@ -46,11 +46,13 @@ func (this *TagSearch) gatherCandidates() {
 		}
 	}
 
+	this.removeSelectedTags(candidates)
+	this.addCandidates(candidates)
+}
+func (this *TagSearch) removeSelectedTags(candidates map[uint64]struct{}) {
 	for _, selectedTagID := range this.selectedTagIDs {
 		delete(candidates, selectedTagID)
 	}
-
-	this.addCandidates(candidates)
 }
 func (this *TagSearch) addCandidates(candidates map[uint64]struct{}) {
 	this.candidateTagIDs = make([]uint64, 0, len(candidates))

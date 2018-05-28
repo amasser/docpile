@@ -9,7 +9,7 @@ import (
 )
 
 type SearchTag struct {
-	Text string   `json:"jsonTextField"`
+	Text string   `json:"text"`
 	Tags []uint64 `json:"tags"`
 }
 
