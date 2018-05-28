@@ -42,12 +42,14 @@ func (this *MatchingTags) documentDefined(message events.DocumentDefined) {
 func (this *MatchingTags) documentRemoved(message events.DocumentRemoved) {
 }
 
-func (this *MatchingTags) Search(text string, tags []uint64) (matching []MatchingTag) {
-	return nil
+func (this *MatchingTags) Search(text string, tags []uint64) []MatchingTag {
+	search := NewTagSearch(text, tags)
+	return search.Search()
 }
 
 type MatchingTag struct {
 	TagID   uint64 `json:"tag_id"`
 	TagText string `json:"text"`
 	Synonym bool   `json:"synonym"`
+	Indexes []int  `json:"indexes"`
 }
