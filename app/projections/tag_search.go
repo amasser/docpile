@@ -61,16 +61,16 @@ func (this *TagSearch) addCandidates() {
 	this.candidateTagValues = make([]string, 0, len(this.candidates))
 
 	for tagID := range this.candidates {
-		this.addCandidate(tagID)
+		tag := this.getTag(tagID)
+		this.addCandidate(tagID, tag.TagName)
+		for synonym := range tag.Synonyms {
+			this.addCandidate(tagID, synonym)
+		}
 	}
 }
-func (this *TagSearch) addCandidate(tagID uint64) {
-	tag := this.getTag(tagID)
-	this.candidateTagIDs = append(this.candidateTagIDs, tag.TagID)
-	this.candidateTagValues = append(this.candidateTagValues, tag.TagName)
-	for synonym := range tag.Synonyms {
-		this.candidateTagValues = append(this.candidateTagValues, synonym)
-	}
+func (this *TagSearch) addCandidate(id uint64, value string) {
+	this.candidateTagIDs = append(this.candidateTagIDs, id)
+	this.candidateTagValues = append(this.candidateTagValues, value)
 }
 
 func (this *TagSearch) conductSearch() {
