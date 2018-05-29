@@ -8,21 +8,21 @@ import (
 	"github.com/smartystreets/detour"
 )
 
-type RenameTag struct {
+type TagInput struct {
 	ID   uint64 `json:"-"`
 	Name string `json:"name"`
 }
 
-func (this *RenameTag) Bind(request *http.Request) error {
+func (this *TagInput) Bind(request *http.Request) error {
 	this.ID = idFromURLPath(request)
 	return json.NewDecoder(request.Body).Decode(this)
 }
 
-func (this *RenameTag) Sanitize() {
+func (this *TagInput) Sanitize() {
 	this.Name = strings.TrimSpace(this.Name)
 }
 
-func (this *RenameTag) Validate() error {
+func (this *TagInput) Validate() error {
 	var errors detour.Errors
 	errors = errors.AppendIf(missingTagIDError, this.ID == 0)
 	errors = errors.AppendIf(missingTagNameError, len(this.Name) == 0)

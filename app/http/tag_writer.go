@@ -28,14 +28,14 @@ func (this *TagWriter) Remove(input *inputs.IDInput) detour.Renderer {
 		return nil
 	}
 }
-func (this *TagWriter) Rename(input *inputs.RenameTag) detour.Renderer {
+func (this *TagWriter) Rename(input *inputs.TagInput) detour.Renderer {
 	return this.renderTagResult(domain.RenameTag{ID: input.ID, Name: input.Name})
 }
 
-func (this *TagWriter) DefineSynonym(input *inputs.DefineTagSynonym) detour.Renderer {
+func (this *TagWriter) DefineSynonym(input *inputs.TagInput) detour.Renderer {
 	return this.renderTagResult(domain.DefineTagSynonym{ID: input.ID, Name: input.Name})
 }
-func (this *TagWriter) RemoveSynonym(input *inputs.RemoveTagSynonym) detour.Renderer {
+func (this *TagWriter) RemoveSynonym(input *inputs.TagInput) detour.Renderer {
 	return this.renderTagResult(domain.RemoveTagSynonym{ID: input.ID, Name: input.Name})
 }
 
