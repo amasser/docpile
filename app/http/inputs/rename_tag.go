@@ -9,11 +9,12 @@ import (
 )
 
 type RenameTag struct {
-	ID   uint64 `json:"tag_id"`
+	ID   uint64 `json:"-"`
 	Name string `json:"name"`
 }
 
 func (this *RenameTag) Bind(request *http.Request) error {
+	this.ID = idFromURLPath(request)
 	return json.NewDecoder(request.Body).Decode(this)
 }
 

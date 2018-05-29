@@ -9,11 +9,12 @@ import (
 )
 
 type RemoveTagSynonym struct {
-	ID   uint64 `json:"tag_id"`
+	ID   uint64 `json:"-"`
 	Name string `json:"name"`
 }
 
 func (this *RemoveTagSynonym) Bind(request *http.Request) error {
+	this.ID = idFromURLPath(request)
 	return json.NewDecoder(request.Body).Decode(this)
 }
 

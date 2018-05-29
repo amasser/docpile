@@ -2,8 +2,6 @@ package inputs
 
 import (
 	"net/http"
-	"path"
-	"strconv"
 
 	"github.com/smartystreets/detour"
 )
@@ -13,7 +11,7 @@ type IDInput struct {
 }
 
 func (this *IDInput) Bind(request *http.Request) error {
-	this.ID, _ = strconv.ParseUint(path.Base(request.URL.Path), 10, 64)
+	this.ID = idFromURLPath(request)
 	return nil
 }
 
