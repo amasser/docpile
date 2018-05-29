@@ -78,20 +78,22 @@ func (this *TagSearch) conductSearch() {
 
 func (this *TagSearch) renderResults() {
 	for _, fuzzyMatch := range this.fuzzyMatches {
-		tagID := this.candidateTagIDs[fuzzyMatch.Index]
-		isSynonym := this.isSynonym(tagID, fuzzyMatch.Str)
-		this.results = append(this.results, MatchingTag{
-			TagID:   tagID,
-			TagText: fuzzyMatch.Str,
-			Synonym: isSynonym,
-			Indexes: fuzzyMatch.MatchedIndexes,
-		})
+		this.addResult(fuzzyMatch)
 	}
+}
+func (this *TagSearch) addResult(value fuzzy.Match) {
+	tagID := this.candidateTagIDs[value.Index]
+	isSynonym := this.isSynonym(tagID, value.Str)
+	this.results = append(this.results, MatchingTag{
+		TagID:   tagID,
+		TagText: value.Str,
+		Synonym: isSynonym,
+		Indexes: value.MatchedIndexes,
+	})
 }
 func (this *TagSearch) isSynonym(id uint64, value string) bool {
 	return this.getTag(id).TagName != value
 }
-
 func (this *TagSearch) getTag(id uint64) Tag {
 	return this.allTags[this.tagIndexByID[id]]
 }
