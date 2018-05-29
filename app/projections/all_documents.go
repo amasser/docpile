@@ -13,7 +13,7 @@ type AllDocuments struct {
 }
 
 func NewAllDocuments() *AllDocuments {
-	return &AllDocuments{index: map[uint64]int{}}
+	return &AllDocuments{index: map[uint64]int{}, items: []Document{}}
 }
 
 func (this *AllDocuments) Transform(message interface{}) {

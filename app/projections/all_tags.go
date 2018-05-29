@@ -13,7 +13,7 @@ type AllTags struct {
 }
 
 func NewAllTags() *AllTags {
-	return &AllTags{index: map[uint64]int{}}
+	return &AllTags{index: map[uint64]int{}, items: []Tag{}}
 }
 
 func (this *AllTags) Transform(message interface{}) {

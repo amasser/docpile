@@ -24,6 +24,7 @@ func NewTagSearch(documents []Document, tagIndexByID map[uint64]int, allTags []T
 		tagIndexByID: tagIndexByID,
 		allTags:      allTags,
 		candidates:   make(map[uint64]struct{}),
+		results:      []MatchingTag{},
 	}
 }
 
