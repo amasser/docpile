@@ -48,6 +48,8 @@ func (this *TagWriter) renderTagResult(message interface{}) detour.Renderer {
 		return inputs.DuplicateTagResult
 	} else if result.Error == domain.TagNotFoundError {
 		return inputs.TagNotFoundResult
+	} else if result.Error == domain.SynonymNotFoundError {
+		return inputs.SynonymNotFoundResult
 	} else {
 		return UnknownErrorResult
 	}

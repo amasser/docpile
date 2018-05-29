@@ -116,8 +116,10 @@ func (this *Aggregate) DefineTagSynonym(id uint64, name string) handlers.Result 
 	})
 }
 func (this *Aggregate) RemoveTagSynonym(id uint64, name string) handlers.Result {
-	if result := this.validTagInput(id, name); result.Error != nil {
-		return result
+	if _, contains := this.tagsByID[id]; !contains {
+		return newResult(0, TagNotFoundError)
+	} else if _, contains := this.tagsByNormalizedName[normalizeTag(name)]; !contains {
+		return newResult(0, SynonymNotFoundError)
 	}
 
 	return this.raise(id, events.TagSynonymRemoved{
@@ -324,10 +326,11 @@ func newResult(id uint64, err error) handlers.Result {
 }
 
 var (
+	TagNotFoundError        = errors.New("tag not found")
 	TagAlreadyExistsError   = errors.New("tag already exists")
+	SynonymNotFoundError    = errors.New("synonym not found")
 	AssetAlreadyExistsError = errors.New("asset already exists")
 	AssetNotFoundError      = errors.New("asset not found")
-	TagNotFoundError        = errors.New("tag not found")
 	DocumentNotFoundError   = errors.New("document not found")
 	StoreAssetError         = errors.New("unable to storage asset")
 )
