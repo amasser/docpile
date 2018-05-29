@@ -18,6 +18,23 @@ type TagSearch struct {
 	results      []MatchingTag
 }
 
+/*
+As a tag is selected, the id is added to the tag search so that:
+1. that tag (and synonyms) are no longer returned in the suggested result set
+2. only tags/synonyms associated with documents containing the selected tags are returned
+
+this has the effect of rapidly narrowing the window of available tags instead of making
+the user swim through hundreds of useless tags that obviously don't apply and could never
+be met as a search condition.
+
+For example:
+GET /search/tags?text=search+query&tag=previouslySelectedTagID1&tag=previouslySelectedTagID2
+
+In this search above, "search query" would not return any tag names/synonyms for
+previouslySelectedTagID1 and previouslySelectedTagID2. Further, "search query" would only match
+names and synonyms for tags for documents that contain by previouslySelectedTagID1 and 2.
+*/
+
 func NewTagSearch(documents []Document, tagIndexByID map[uint64]int, allTags []Tag) *TagSearch {
 	return &TagSearch{
 		allDocs:      documents,
