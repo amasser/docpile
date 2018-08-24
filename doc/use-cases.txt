@@ -1,0 +1,24 @@
+Use cases:
+
+List all tags (and synonyms)
+Search for tags that match ...
+
+Search: what do I need?
+
+- Document ID
+- Timestamp
+- Asset ID
+- Asset Offset?
+- Published
+- Period Begin
+- Period End
+- Tags
+- Documents
+- Description
+
+- Searching for a tag
+
+- List Tags
+= Tag ID, Timestamp, Name, Synonyms
+
+- List Documents = ordered by definition date (newest first)
