@@ -73,7 +73,7 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	search := http.NewSearch(projector.AllDocuments, projector.MatchingTags)
 
 	router := buildRouter()
-	router.Handler("OPTIONS", "/*wildcard", middleware.OriginCORSHeadersHandler("localhost:8888"))
+	router.Handler("OPTIONS", "/*wildcard", middleware.OriginCORSHeadersHandler("http://localhost:3000"))
 
 	router.Handler("PUT", "/tags", this.writerAction(tagWriter.Add))
 	router.Handler("DELETE", "/tags/:id", this.writerAction(tagWriter.Remove))
