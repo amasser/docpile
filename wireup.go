@@ -97,10 +97,14 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	return router
 }
 func (this *Wireup) writerAction(action interface{}) stdhttp.Handler {
-	return detour.New(action)
+	handler := middleware.BrowserHeadersHandler(map[string]string{"Access-Control-Allow-Origin": "*"})
+	handler.Install(detour.New(action))
+	return handler
 }
 func (this *Wireup) readerAction(action interface{}) stdhttp.Handler {
-	return middleware.NewLockHandler(this.mutex.RLocker(), detour.New(action))
+	handler := middleware.BrowserHeadersHandler(map[string]string{"Access-Control-Allow-Origin": "*"})
+	handler.Install(detour.New(action))
+	return middleware.NewLockHandler(this.mutex.RLocker(), handler)
 }
 
 func buildRouter() *httprouter.Router {
