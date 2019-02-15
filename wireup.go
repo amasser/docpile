@@ -92,7 +92,7 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	router.Handler("POST", "/search/documents", this.readerAction(search.Documents))
 	router.Handler("POST", "/search/tags", this.readerAction(search.Tags))
 
-	router.Handler("OPTIONS", "/*wildcard", middleware.OriginCORSHeadersHandler("localhost:8888", "localhost:8080"))
+	router.Handler("OPTIONS", "/*wildcard", middleware.OriginCORSHeadersHandler("localhost:8888"))
 
 	return router
 }

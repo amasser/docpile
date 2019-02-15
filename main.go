@@ -3,7 +3,7 @@ package main
 import "log"
 
 const (
-	listenAddress = "127.0.0.1:8080"
+	listenAddress = "127.0.0.1:8888"
 	workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
 )
 
