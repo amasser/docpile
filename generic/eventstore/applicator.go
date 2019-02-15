@@ -1,6 +1,6 @@
 package eventstore
 
-import "bitbucket.org/jonathanoliver/docpile/generic/applicators"
+import "github.com/joliver/docpile/generic/applicators"
 
 type Applicator struct {
 	inner applicators.Applicator

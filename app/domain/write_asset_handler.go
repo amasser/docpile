@@ -8,9 +8,9 @@ import (
 	"io/ioutil"
 	"path"
 
-	"bitbucket.org/jonathanoliver/docpile/app/events"
-	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
-	"bitbucket.org/jonathanoliver/docpile/generic/storage"
+	"github.com/joliver/docpile/app/events"
+	"github.com/joliver/docpile/generic/handlers"
+	"github.com/joliver/docpile/generic/storage"
 )
 
 type WriteAssetHandler struct {

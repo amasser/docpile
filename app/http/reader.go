@@ -1,8 +1,8 @@
 package http
 
 import (
-	"bitbucket.org/jonathanoliver/docpile/app/http/inputs"
-	"bitbucket.org/jonathanoliver/docpile/app/projections"
+	"github.com/joliver/docpile/app/http/inputs"
+	"github.com/joliver/docpile/app/projections"
 	"github.com/smartystreets/detour"
 )
 

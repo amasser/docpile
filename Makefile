@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 PACKAGE_NAME := docpile
-PACKAGE_PATH := bitbucket.org/jonathanoliver/$(PACKAGE_NAME)
+PACKAGE_PATH := github.com/joliver/$(PACKAGE_NAME)
 
 build:
 	go fmt ./... && go build ./...

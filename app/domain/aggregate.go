@@ -8,9 +8,9 @@ import (
 	"reflect"
 	"strings"
 
-	"bitbucket.org/jonathanoliver/docpile/app/events"
-	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
-	"bitbucket.org/jonathanoliver/docpile/generic/identity"
+	"github.com/joliver/docpile/app/events"
+	"github.com/joliver/docpile/generic/handlers"
+	"github.com/joliver/docpile/generic/identity"
 	"github.com/smartystreets/clock"
 )
 

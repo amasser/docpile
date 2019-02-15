@@ -3,7 +3,7 @@ package projections
 import (
 	"testing"
 
-	"bitbucket.org/jonathanoliver/docpile/app/events"
+	"github.com/joliver/docpile/app/events"
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 )

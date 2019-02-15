@@ -1,6 +1,6 @@
 package handlers
 
-import "bitbucket.org/jonathanoliver/docpile/generic/applicators"
+import "github.com/joliver/docpile/generic/applicators"
 
 type Domain struct {
 	aggregate  Aggregate

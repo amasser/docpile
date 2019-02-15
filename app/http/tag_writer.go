@@ -1,9 +1,9 @@
 package http
 
 import (
-	"bitbucket.org/jonathanoliver/docpile/app/domain"
-	"bitbucket.org/jonathanoliver/docpile/app/http/inputs"
-	"bitbucket.org/jonathanoliver/docpile/generic/handlers"
+	"github.com/joliver/docpile/app/domain"
+	"github.com/joliver/docpile/app/http/inputs"
+	"github.com/joliver/docpile/generic/handlers"
 	"github.com/smartystreets/detour"
 )
 

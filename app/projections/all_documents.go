@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"bitbucket.org/jonathanoliver/docpile/app/events"
+	"github.com/joliver/docpile/app/events"
 )
 
 type AllDocuments struct {
