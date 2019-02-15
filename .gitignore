@@ -3,6 +3,7 @@
 *.swp
 __MACOSX
 /bin
+/workspace
 
 config.json
 coverage.out

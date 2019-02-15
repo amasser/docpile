@@ -73,6 +73,8 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	search := http.NewSearch(projector.AllDocuments, projector.MatchingTags)
 
 	router := buildRouter()
+	router.Handler("OPTIONS", "/*wildcard", middleware.OriginCORSHeadersHandler("localhost:8888"))
+
 	router.Handler("PUT", "/tags", this.writerAction(tagWriter.Add))
 	router.Handler("DELETE", "/tags/:id", this.writerAction(tagWriter.Remove))
 	router.Handler("POST", "/tags/:id/name", this.writerAction(tagWriter.Rename))
@@ -91,8 +93,6 @@ func (this *Wireup) BuildHTTPHandler(application handlers.Handler, projector *pr
 	// these methods don't mutate, but binding is easier when JSON decoding the request body.
 	router.Handler("POST", "/search/documents", this.readerAction(search.Documents))
 	router.Handler("POST", "/search/tags", this.readerAction(search.Tags))
-
-	router.Handler("OPTIONS", "/*wildcard", middleware.OriginCORSHeadersHandler("localhost:8888"))
 
 	return router
 }

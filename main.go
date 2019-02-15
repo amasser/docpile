@@ -4,7 +4,7 @@ import "log"
 
 const (
 	listenAddress = "127.0.0.1:8888"
-	workspacePath = "/Users/jonathan/Downloads/docpile/workspace"
+	workspacePath = "./workspace"
 )
 
 func init() {
